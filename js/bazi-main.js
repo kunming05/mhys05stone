@@ -73,8 +73,8 @@ function paiPan(name, gender, year, month, day, hour, minute, longitude, useTrue
         _0x8d += "**十神：**年" + _result.shiShen.year.gan + " 月" + _result.shiShen.month.gan + " 日" + _result.shiShen.day.gan + " 时" + _result.shiShen.time.gan + "\n";
         _0x8d += "**空亡：**" + _result.xunKong.year + " " + _result.xunKong.month + " " + _result.xunKong.day + " " + _result.xunKong.time + "\n";
         _0x8d += "**旺衰：**<font color='warning'>" + _result.wangShuai.level + "</font>(" + _result.wangShuai.baseWang + ")\n";
-        _0x8d += "**格局：**" + (_result.congGe.isCongGe ? "<font color='red'>" + _result.congGe.congType + "</font>' : "正格") + "\n";
-        _0x8d += "**化气：**" + (_result.huaQi.isHuaQi ? "<font color='red'>" + _result.huaQi.type + "</font>' : "非化气格") + "\n";
+        _0x8d += "**格局：**" + (_result.congGe.isCongGe ? "<font color='red'>" + _result.congGe.congType + "</font>" : "正格") + "\n";
+        _0x8d += "**化气：**" + (_result.huaQi.isHuaQi ? "<font color='red'>" + _result.huaQi.type + "</font>" : "非化气格") + "\n";
         _0x8d += "**强弱：**<font color='info'>" + _result.riZhuDetail.level + "</font>(" + _result.riZhuDetail.totalScore.toFixed(1) + "分)\n";
         _0x8d += "**大运：**" + _result.daYun.isForward + " " + _result.daYun.qiYunAge + "岁" + _result.daYun.qiYunMonth + "个月起运\n";
         var _dy0 = _result.daYun.daYun[0];
