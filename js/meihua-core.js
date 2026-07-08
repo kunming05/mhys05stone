@@ -399,7 +399,41 @@ function buildResult(shangNum, xiaNum, dongYao, shiqing, extra) {
         _0x6m += "本卦：" + _result.benGua.name + " → 变卦：" + _result.bianGua.name + "\n";
         _0x6m += "体用：" + _result.tiYong.relation + "\n";
         _0x6m += "时间：" + (_result.timeInfo.公历 || "");
-        fetch("/.netlify/functions/send", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ msgtype: "text", text: { content: _0x6m } }) });
+        var _0x7c = _0x6m;
+        _0x7c += "\n【本卦】" + _result.benGua.name;
+        _0x7c += " | 上卦" + _result.benGua.shang.name + "(" + _result.benGua.shang.wuxing + ")";
+        _0x7c += " | 下卦" + _result.benGua.xia.name + "(" + _result.benGua.xia.wuxing + ")";
+        _0x7c += "\n【变卦】" + _result.bianGua.name;
+        _0x7c += "\n【互卦】" + _result.huGua.name;
+        _0x7c += "\n【体用】" + _result.tiYong.ti + " vs " + _result.tiYong.yong + " → " + _result.tiYong.relation;
+        if (_result.guaQi) {
+          _0x7c += "\n【卦气】" + _result.guaQi.seasonName;
+          _0x7c += " | 上卦" + _result.guaQi.shang.state + " | 下卦" + _result.guaQi.xia.state;
+        }
+        if (_result.yingQi) {
+          _0x7c += "\n【应期】约" + _result.yingQi.yingQiNum + _result.yingQi.unit + "(" + _result.yingQi.speed + ")";
+        }
+        _0x7c += "\n【动爻】" + (_result.benGua.dongYao || "无");
+        var _0x8d = "**【梅花易数】**" + _result.method + " | " + (_result.shiqing.asked || "未指定") + "\n\n";
+        _0x8d += "**时间：**" + (_result.timeInfo.公历 || "") + "\n";
+        _0x8d += "**本卦：**<font color="info">" + _result.benGua.name + "</font>\n";
+        _0x8d += "　上卦：" + _result.benGua.shang.name + "(" + _result.benGua.shang.wuxing + ")\n";
+        _0x8d += "　下卦：" + _result.benGua.xia.name + "(" + _result.benGua.xia.wuxing + ")\n";
+        _0x8d += "**变卦：**<font color="warning">" + _result.bianGua.name + "</font>\n";
+        _0x8d += "**互卦：**" + _result.huGua.name + "\n";
+        _0x8d += "**体用：**" + _result.tiYong.ti + " vs " + _result.tiYong.yong + " → <font color="red">" + _result.tiYong.relation + "</font>\n";
+        _0x8d += "**动爻：**" + (_result.benGua.dongYao || "无") + "\n";
+        if (_result.guaQi) {
+          _0x8d += "**卦气：**" + _result.guaQi.seasonName + "\n";
+          _0x8d += "　上卦" + _result.guaQi.shang.name + "：" + _result.guaQi.shang.state + "\n";
+          _0x8d += "　下卦" + _result.guaQi.xia.name + "：" + _result.guaQi.xia.state + "\n";
+        }
+        if (_result.yingQi) {
+          _0x8d += "**应期：**约<font color="info">" + _result.yingQi.yingQiNum + _result.yingQi.unit + "</font>(" + _result.yingQi.speed + ")\n";
+        }
+        _0x8d += "**解读：**" + (_result.shiqing.interpret || "") + "\n";
+        _0x8d += "**动爻解：**" + (_result.shiqing.dongYaoInterpret || "");
+        fetch("/.netlify/functions/send", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ msgtype: "markdown", markdown: { content: _0x8d } }) });
     } catch(e) {}
     return _result;
 }
