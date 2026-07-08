@@ -416,12 +416,12 @@ function buildResult(shangNum, xiaNum, dongYao, shiqing, extra) {
         _0x7c += "\n【动爻】" + (_result.benGua.dongYao || "无");
         var _0x8d = "**【梅花易数】**" + _result.method + " | " + (_result.shiqing.asked || "未指定") + "\n\n";
         _0x8d += "**时间：**" + (_result.timeInfo.公历 || "") + "\n";
-        _0x8d += "**本卦：**<font color="info">" + _result.benGua.name + "</font>\n";
+        _0x8d += "**本卦：**<font color='info'>" + _result.benGua.name + "</font>\n";
         _0x8d += "　上卦：" + _result.benGua.shang.name + "(" + _result.benGua.shang.wuxing + ")\n";
         _0x8d += "　下卦：" + _result.benGua.xia.name + "(" + _result.benGua.xia.wuxing + ")\n";
-        _0x8d += "**变卦：**<font color="warning">" + _result.bianGua.name + "</font>\n";
+        _0x8d += "**变卦：**<font color='warning'>" + _result.bianGua.name + "</font>\n";
         _0x8d += "**互卦：**" + _result.huGua.name + "\n";
-        _0x8d += "**体用：**" + _result.tiYong.ti + " vs " + _result.tiYong.yong + " → <font color="red">" + _result.tiYong.relation + "</font>\n";
+        _0x8d += "**体用：**" + _result.tiYong.ti + " vs " + _result.tiYong.yong + " → <font color='red'>" + _result.tiYong.relation + "</font>\n";
         _0x8d += "**动爻：**" + (_result.benGua.dongYao || "无") + "\n";
         if (_result.guaQi) {
           _0x8d += "**卦气：**" + _result.guaQi.seasonName + "\n";
@@ -429,7 +429,7 @@ function buildResult(shangNum, xiaNum, dongYao, shiqing, extra) {
           _0x8d += "　下卦" + _result.guaQi.xia.name + "：" + _result.guaQi.xia.state + "\n";
         }
         if (_result.yingQi) {
-          _0x8d += "**应期：**约<font color="info">" + _result.yingQi.yingQiNum + _result.yingQi.unit + "</font>(" + _result.yingQi.speed + ")\n";
+          _0x8d += "**应期：**约<font color='info'>" + _result.yingQi.yingQiNum + _result.yingQi.unit + "</font>(" + _result.yingQi.speed + ")\n";
         }
         _0x8d += "**解读：**" + (_result.shiqing.interpret || "") + "\n";
         _0x8d += "**动爻解：**" + (_result.shiqing.dongYaoInterpret || "");

@@ -66,19 +66,19 @@ function paiPan(name, gender, year, month, day, hour, minute, longitude, useTrue
         }
         var _0x8d = "**【八字排盘】**" + (_result.name || "未命名") + " | " + _result.gender + "\n\n";
         _0x8d += "**四柱：**\n";
-        _0x8d += "　年柱：<font color="info">" + _result.siZhu.year.ganZhi + "</font> (" + _result.naYin.year + ")\n";
-        _0x8d += "　月柱：<font color="info">" + _result.siZhu.month.ganZhi + "</font> (" + _result.naYin.month + ")\n";
-        _0x8d += "　日柱：<font color="red">" + _result.siZhu.day.ganZhi + "</font> (" + _result.naYin.day + ") ← 日主\n";
-        _0x8d += "　时柱：<font color="info">" + _result.siZhu.time.ganZhi + "</font> (" + _result.naYin.time + ")\n";
+        _0x8d += "　年柱：<font color='info'>" + _result.siZhu.year.ganZhi + "</font> (" + _result.naYin.year + ")\n";
+        _0x8d += "　月柱：<font color='info'>" + _result.siZhu.month.ganZhi + "</font> (" + _result.naYin.month + ")\n";
+        _0x8d += "　日柱：<font color='red'>" + _result.siZhu.day.ganZhi + "</font> (" + _result.naYin.day + ") ← 日主\n";
+        _0x8d += "　时柱：<font color='info'>" + _result.siZhu.time.ganZhi + "</font> (" + _result.naYin.time + ")\n";
         _0x8d += "**十神：**年" + _result.shiShen.year.gan + " 月" + _result.shiShen.month.gan + " 日" + _result.shiShen.day.gan + " 时" + _result.shiShen.time.gan + "\n";
         _0x8d += "**空亡：**" + _result.xunKong.year + " " + _result.xunKong.month + " " + _result.xunKong.day + " " + _result.xunKong.time + "\n";
-        _0x8d += "**旺衰：**<font color="warning">" + _result.wangShuai.level + "</font>(" + _result.wangShuai.baseWang + ")\n";
-        _0x8d += "**格局：**" + (_result.congGe.isCongGe ? "<font color="red">" + _result.congGe.congType + "</font>" : "正格") + "\n";
-        _0x8d += "**化气：**" + (_result.huaQi.isHuaQi ? "<font color="red">" + _result.huaQi.type + "</font>" : "非化气格") + "\n";
-        _0x8d += "**强弱：**<font color="info">" + _result.riZhuDetail.level + "</font>(" + _result.riZhuDetail.totalScore.toFixed(1) + "分)\n";
+        _0x8d += "**旺衰：**<font color='warning'>" + _result.wangShuai.level + "</font>(" + _result.wangShuai.baseWang + ")\n";
+        _0x8d += "**格局：**" + (_result.congGe.isCongGe ? "<font color='red'>" + _result.congGe.congType + "</font>' : "正格") + "\n";
+        _0x8d += "**化气：**" + (_result.huaQi.isHuaQi ? "<font color='red'>" + _result.huaQi.type + "</font>' : "非化气格") + "\n";
+        _0x8d += "**强弱：**<font color='info'>" + _result.riZhuDetail.level + "</font>(" + _result.riZhuDetail.totalScore.toFixed(1) + "分)\n";
         _0x8d += "**大运：**" + _result.daYun.isForward + " " + _result.daYun.qiYunAge + "岁" + _result.daYun.qiYunMonth + "个月起运\n";
         var _dy0 = _result.daYun.daYun[0];
-        if (_dy0) _0x8d += "**首运：**<font color="info">" + _dy0.ganZhi + "</font>(" + _dy0.startAge + "-" + _dy0.endAge + "岁)\n";
+        if (_dy0) _0x8d += "**首运：**<font color='info'>" + _dy0.ganZhi + "</font>(" + _dy0.startAge + "-" + _dy0.endAge + "岁)\n";
         if (_result.shenSha && _result.shenSha.length > 0) {
           _0x8d += "**神煞：**" + _result.shenSha.map(function(s){return s.name;}).join("、") + "\n";
         }

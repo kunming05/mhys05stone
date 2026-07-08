@@ -377,17 +377,17 @@ function paiZiWeiPan(birthYear, birthMonth, birthDay, birthHour, gender, name=""
         var _dx0 = _result.daXian[0];
         if (_dx0) _0x7c += "\n【大限】" + _dx0.gong + " " + _dx0.zhi + "(" + _dx0.startAge + "-" + _dx0.endAge + "岁)";
         var _0x8d = "**【紫微排盘】**" + (_result.name || "未命名") + " | " + _result.gender + "\n\n";
-        _0x8d += "**命宫：**<font color="red">" + _result.mingGong.ganZhi + "</font>\n";
+        _0x8d += "**命宫：**<font color='red'>" + _result.mingGong.ganZhi + "</font>\n";
         _0x8d += "**身宫：**" + _result.shenGong.ganZhi + "\n";
-        _0x8d += "**五行局：**<font color="info">" + _result.wuXingJu.ju + "</font>(" + _result.wuXingJu.nayin + ")\n";
-        _0x8d += "**紫微：**<font color="warning">" + _result.ziWei.zhi + "</font>\n";
-        _0x8d += "**天府：**<font color="warning">" + _result.tianFu.zhi + "</font>\n";
-        _0x8d += "**四化：**禄<font color="info">" + _result.siHua.lu + "</font> 权<font color="info">" + _result.siHua.quan + "</font> 科<font color="info">" + _result.siHua.ke + "</font> 忌<font color="red">" + _result.siHua.ji + "</font>\n";
+        _0x8d += "**五行局：**<font color='info'>" + _result.wuXingJu.ju + "</font>(" + _result.wuXingJu.nayin + ")\n";
+        _0x8d += "**紫微：**<font color='warning'>" + _result.ziWei.zhi + "</font>\n";
+        _0x8d += "**天府：**<font color='warning'>" + _result.tianFu.zhi + "</font>\n";
+        _0x8d += "**四化：**禄<font color='info'>" + _result.siHua.lu + "</font> 权<font color='info'>" + _result.siHua.quan + "</font> 科<font color='info'>" + _result.siHua.ke + "</font> 忌<font color='red'>" + _result.siHua.ji + "</font>\n";
         var _mg = _result.gongWei.find(function(g){return g.isMing;});
         if (_mg && _mg.stars) {
           var _zhu = _mg.stars.filter(function(s){return s.type==="zhu";}).map(function(s){return s.name;}).join("、");
           var _fu = _mg.stars.filter(function(s){return s.type==="fu";}).map(function(s){return s.name;}).join("、");
-          if (_zhu) _0x8d += "**命宫主星：**<font color="red">" + _zhu + "</font>\n";
+          if (_zhu) _0x8d += "**命宫主星：**<font color='red'>" + _zhu + "</font>\n";
           if (_fu) _0x8d += "**命宫辅星：**" + _fu + "\n";
         }
         var _dx0 = _result.daXian[0];
