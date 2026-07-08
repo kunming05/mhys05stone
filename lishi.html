@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <title>历史 · 梅花易数</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <style>
+        .history-tabs { display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 1px solid var(--xuan-border); padding-bottom: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+        .history-tabs::-webkit-scrollbar { display: none; }
+        .history-tab { padding: 8px 16px; border-radius: 16px; font-size: 14px; border: 1px solid var(--xuan-border); background: #fff; color: var(--xuan-brown); cursor: pointer; transition: all 0.2s; white-space: nowrap; flex-shrink: 0; -webkit-tap-highlight-color: transparent; }
+        .history-tab.active { background: var(--xuan-green); color: #fff; border-color: var(--xuan-green); }
+        .history-panel { display: none; }
+        .history-panel.active { display: block; }
+
+        @media (max-width: 480px) {
+            .history-tab { padding: 6px 12px; font-size: 13px; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav-main">
+        <div class="nav-inner">
+            <div class="nav-brand">
+                <span class="nav-logo">易</span>
+                <span class="nav-title">梅花易数</span>
+            </div>
+            <div class="nav-links">
+                <a href="index.html">首页</a>
+                <a href="qigua.html">起卦</a>
+                <a href="mingli.html">命理</a>
+                <a href="ziwei.html">紫微</a>
+                <a href="lishi.html" class="active">历史</a>
+                <a href="bangzhu.html">帮助</a>
+            </div>
+        </div>
+    </nav>
+    <main class="container">
+        <h2 class="page-title">历史记录</h2>
+
+        <div class="history-tabs">
+            <button onclick="switchHistory('qigua')" class="history-tab active" data-tab="qigua">起卦记录</button>
+            <button onclick="switchHistory('bazi')" class="history-tab" data-tab="bazi">八字记录</button>
+            <button onclick="switchHistory('ziwei')" class="history-tab" data-tab="ziwei">紫微记录</button>
+        </div>
+
+        <div id="panel-qigua" class="history-panel active">
+            <div id="qigua-list"></div>
+            <div id="qigua-empty" class="hidden text-center py-12 text-xuan-brown">暂无起卦记录</div>
+            <div class="mt-6 flex gap-3 flex-wrap">
+                <button onclick="window.exportHistory()" class="btn-outline">导出起卦记录</button>
+                <button onclick="if(confirm('确定清空所有起卦记录？')){window.clearHistory();renderHistory();}" class="btn-outline" style="color:var(--xuan-red);border-color:var(--xuan-red);">清空起卦记录</button>
+            </div>
+        </div>
+
+        <div id="panel-bazi" class="history-panel">
+            <div id="bazi-list"></div>
+            <div id="bazi-empty" class="hidden text-center py-12 text-xuan-brown">暂无八字记录</div>
+            <div class="mt-6 flex gap-3 flex-wrap">
+                <button onclick="window.exportBaziHistory()" class="btn-outline">导出八字记录</button>
+                <button onclick="if(confirm('确定清空所有八字记录？')){window.clearBaziHistory();renderHistory();}" class="btn-outline" style="color:var(--xuan-red);border-color:var(--xuan-red);">清空八字记录</button>
+            </div>
+        </div>
+
+        <div id="panel-ziwei" class="history-panel">
+            <div id="ziwei-list"></div>
+            <div id="ziwei-empty" class="hidden text-center py-12 text-xuan-brown">暂无紫微记录</div>
+            <div class="mt-6 flex gap-3 flex-wrap">
+                <button onclick="window.exportZiWeiHistory()" class="btn-outline">导出紫微记录</button>
+                <button onclick="if(confirm('确定清空所有紫微记录？')){window.clearZiWeiHistory();renderHistory();}" class="btn-outline" style="color:var(--xuan-red);border-color:var(--xuan-red);">清空紫微记录</button>
+            </div>
+        </div>
+    </main>
+    <footer class="footer"><p>梅花易数 · 易学工具</p></footer>
+
+    <script src="js/meihua-core.js"></script>
+    <script src="js/bazi-main.js"></script>
+    <script src="js/ziwei-engine.js"></script>
+    <script>
+        function switchHistory(tab) {
+            document.querySelectorAll('.history-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector('.history-tab[data-tab="'+tab+'"]')?.classList.add('active');
+            document.querySelectorAll('.history-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById('panel-'+tab).classList.add('active');
+        }
+
+        function renderHistory() {
+            const qiGuaHistory = window.loadHistory();
+            const qiguaList = document.getElementById('qigua-list');
+            const qiguaEmpty = document.getElementById('qigua-empty');
+            if (qiGuaHistory.length === 0) {
+                qiguaList.innerHTML = ''; qiguaEmpty.classList.remove('hidden');
+            } else {
+                qiguaEmpty.classList.add('hidden');
+                qiguaList.innerHTML = qiGuaHistory.slice().reverse().map(r => `
+                    <div class="card-white mb-3">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs px-2 py-0.5 rounded" style="background:rgba(45,90,61,0.1);color:var(--xuan-green);">${r.id}</span>
+                                <span class="text-sm text-xuan-brown">${r.method}</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="viewQiGua('${r.id}')" class="text-xs px-2 py-1 rounded" style="background:var(--xuan-green);color:#fff;border:none;cursor:pointer;">查看</button>
+                                <button onclick="window.deleteHistory('${r.id}');renderHistory();" class="text-xs px-2 py-1 rounded" style="color:var(--xuan-red);border:1px solid var(--xuan-red);background:transparent;cursor:pointer;">删除</button>
+                            </div>
+                        </div>
+                        <div class="font-serif text-lg font-bold" style="color:var(--xuan-dark);">${r.benGua?.name||'未知'} → ${r.bianGua?.name||'未知'}</div>
+                        <div class="text-sm text-xuan-brown mt-1">${r.timeInfo?.公历||''} · ${r.shiqing?.asked||''}</div>
+                        <div class="text-xs mt-2" style="color:var(--xuan-gold);">体用：${r.tiYong?.relation||''}</div>
+                    </div>
+                `).join('');
+            }
+
+            const baziHistory = window.loadBaziHistory ? window.loadBaziHistory() : [];
+            const baziList = document.getElementById('bazi-list');
+            const baziEmpty = document.getElementById('bazi-empty');
+            if (baziHistory.length === 0) {
+                baziList.innerHTML = ''; baziEmpty.classList.remove('hidden');
+            } else {
+                baziEmpty.classList.add('hidden');
+                baziList.innerHTML = baziHistory.slice().reverse().map(r => `
+                    <div class="card-white mb-3">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs px-2 py-0.5 rounded" style="background:rgba(201,168,76,0.15);color:var(--xuan-gold);">${r.id}</span>
+                                <span class="text-sm text-xuan-brown">${r.gender}命 · ${r.riGan}${r.riZhi}日</span>
+                            </div>
+                            <button onclick="window.deleteBaziHistory('${r.id}');renderHistory();" class="text-xs px-2 py-1 rounded" style="color:var(--xuan-red);border:1px solid var(--xuan-red);background:transparent;cursor:pointer;">删除</button>
+                        </div>
+                        <div class="font-serif text-lg font-bold" style="color:var(--xuan-dark);">${r.siZhu?.year?.ganZhi||''} ${r.siZhu?.month?.ganZhi||''} ${r.siZhu?.day?.ganZhi||''} ${r.siZhu?.time?.ganZhi||''}</div>
+                        <div class="text-sm text-xuan-brown mt-1">${r.birthTime?.year||''}-${r.birthTime?.month||''}-${r.birthTime?.day||''} ${String(r.birthTime?.hour||0).padStart(2,'0')}:${String(r.birthTime?.minute||0).padStart(2,'0')}</div>
+                        <div class="text-xs mt-2" style="color:var(--xuan-gold);">日主${r.riGan} · ${r.wangShuai?.level||''} · ${r.daYun?.isForward?'顺':'逆'}行大运</div>
+                        <div class="mt-2 flex gap-2">
+                            <button onclick="viewBazi('${r.id}')" class="text-xs px-3 py-1 rounded" style="background:var(--xuan-green);color:#fff;border:none;cursor:pointer;">查看</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            const ziweiHistory = window.loadZiWeiHistory ? window.loadZiWeiHistory() : [];
+            const ziweiList = document.getElementById('ziwei-list');
+            const ziweiEmpty = document.getElementById('ziwei-empty');
+            if (ziweiHistory.length === 0) {
+                ziweiList.innerHTML = ''; ziweiEmpty.classList.remove('hidden');
+            } else {
+                ziweiEmpty.classList.add('hidden');
+                ziweiList.innerHTML = ziweiHistory.slice().reverse().map(r => `
+                    <div class="card-white mb-3">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs px-2 py-0.5 rounded" style="background:rgba(184,58,42,0.15);color:var(--xuan-red);">${r.id}</span>
+                                <span class="text-sm text-xuan-brown">${r.gender}命 · ${r.siZhu?.year||''}</span>
+                            </div>
+                            <button onclick="window.deleteZiWeiHistory('${r.id}');renderHistory();" class="text-xs px-2 py-1 rounded" style="color:var(--xuan-red);border:1px solid var(--xuan-red);background:transparent;cursor:pointer;">删除</button>
+                        </div>
+                        <div class="font-serif text-lg font-bold" style="color:var(--xuan-dark);">${r.siZhu?.year||''} ${r.siZhu?.month||''} ${r.siZhu?.day||''} ${r.siZhu?.time||''}</div>
+                        <div class="text-sm text-xuan-brown mt-1">${r.name||'无名'} · ${r.birthTime?.year||''}-${r.birthTime?.month||''}-${r.birthTime?.day||''} ${String(r.birthTime?.hour||0).padStart(2,'0')}:${String(r.birthTime?.minute||0).padStart(2,'0')}</div>
+                        <div class="text-xs mt-2" style="color:var(--xuan-gold);">命宫${r.mingGong?.ganZhi||''} · ${r.wuXingJu?.ju||''} · ${r.mingGongGeJu?.[0]?.name||''}</div>
+                        <div class="mt-2 flex gap-2">
+                            <button onclick="viewZiWei('${r.id}')" class="text-xs px-3 py-1 rounded" style="background:var(--xuan-red);color:#fff;border:none;cursor:pointer;">查看</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function viewZiWei(id) {
+            const history = window.loadZiWeiHistory ? window.loadZiWeiHistory() : [];
+            const record = history.find(r => r.id === id);
+            if (record) {
+                sessionStorage.setItem('ziweiResult', JSON.stringify(record));
+                window.location.href = 'ziwei.html';
+            }
+        }
+
+        function viewBazi(id) {
+            const history = window.loadBaziHistory ? window.loadBaziHistory() : [];
+            const record = history.find(r => r.id === id);
+            if (record) {
+                sessionStorage.setItem('baziResult', JSON.stringify(record));
+                window.location.href = 'bazi.html';
+            }
+        }
+
+        function viewQiGua(id) {
+            const history = window.loadHistory ? window.loadHistory() : [];
+            const record = history.find(r => r.id === id);
+            if (record) {
+                sessionStorage.setItem('currentResult', JSON.stringify(record));
+                window.location.href = 'qigua.html';
+            }
+        }
+        window.onload = renderHistory;
+    </script>
+</body>
+</html>

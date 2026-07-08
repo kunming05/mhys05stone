@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>梅花易数 · 首页</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <style>
+        .grid-3 { display: flex; flex-wrap: wrap; justify-content: center; gap: 24px; padding: 10px 0 20px 0; }
+        .card-home { flex: 0 1 200px; min-width: 160px; max-width: 240px; background: white; border-radius: 16px; padding: 28px 16px 20px; text-align: center; border: 1px solid var(--xuan-border); transition: all 0.25s ease; display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit; }
+        .card-home:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(44,36,22,0.12); }
+        .card-icon { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+        .card-icon svg { width: 30px; height: 30px; stroke-width: 2; fill: none; }
+        .card-home h3 { font-size: 20px; font-weight: 700; margin-bottom: 6px; font-family: var(--font-serif); }
+        .card-home p { font-size: 14px; color: var(--xuan-brown); margin-bottom: 16px; flex: 1; }
+        .divider { height: 2px; background: linear-gradient(90deg, transparent, var(--xuan-gold), transparent); }
+        @media (max-width: 480px) { .card-home { flex: 0 1 140px; min-width: 120px; padding: 20px 12px 16px; } }
+    </style>
+</head>
+<body>
+    <nav class="nav-main">
+        <div class="nav-inner">
+            <div class="nav-brand">
+                <span class="nav-logo">易</span>
+                <span class="nav-title">梅花易数</span>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="active">首页</a>
+                <a href="qigua.html">起卦</a>
+                <a href="mingli.html">命理</a>
+                <a href="lishi.html">历史</a>
+                <a href="bangzhu.html">帮助</a>
+            </div>
+        </div>
+    </nav>
+    <main class="container">
+        <div class="text-center mb-10">
+            <h2 class="page-title">梅花易数 · 易学工具</h2>
+            <p class="page-subtitle">以象数之理，观天地之变</p>
+            <div class="divider mx-auto w-48 mt-4"></div>
+        </div>
+        <div class="grid-3">
+            <a href="ziwei.html" class="card-home">
+                <div class="card-icon" style="background:rgba(184,58,42,0.08);">
+                    <svg viewBox="0 0 24 24" stroke="#b83a2a" stroke-width="2" fill="none" width="30" height="30"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
+                </div>
+                <h3>紫微斗数</h3>
+                <p>十四主星 · 四化飞星<br>十二宫 · 大限流年</p>
+                <span class="btn-primary-sm">进入</span>
+            </a>
+            <a href="qigua.html" class="card-home">
+                <div class="card-icon" style="background:rgba(45,90,61,0.12);">
+                    <svg viewBox="0 0 24 24" stroke="#2d5a3d"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <h3>起卦系统</h3>
+                <p>时间 · 铜钱 · 数字<br>方位 · 声音 · 见物</p>
+                <span class="btn-primary-sm">进入</span>
+            </a>
+            <a href="mingli.html" class="card-home">
+                <div class="card-icon" style="background:rgba(201,168,76,0.12);">
+                    <svg viewBox="0 0 24 24" stroke="#c9a84c"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                </div>
+                <h3>命理系统</h3>
+                <p>四柱八字 · 紫微斗数<br>大运 · 十神 · 格局</p>
+                <span class="btn-primary-sm">进入</span>
+            </a>
+            <a href="lishi.html" class="card-home">
+                <div class="card-icon" style="background:rgba(44,36,22,0.08);">
+                    <svg viewBox="0 0 24 24" stroke="#2c2416"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                </div>
+                <h3>历史记录</h3>
+                <p>起卦 · 八字 · 统一管理</p>
+                <span class="btn-primary-sm">进入</span>
+            </a>
+            <a href="bangzhu.html" class="card-home">
+                <div class="card-icon" style="background:rgba(201,168,76,0.08);">
+                    <svg viewBox="0 0 24 24" stroke="#c9a84c"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                </div>
+                <h3>使用帮助</h3>
+                <p>工具说明 · 免责声明</p>
+                <span class="btn-primary-sm">进入</span>
+            </a>
+        </div>
+    </main>
+    <footer class="footer">
+        <p>梅花易数 · 易学工具 · 仅供学习参考</p>
+    </footer>
+    <script src="js/meihua-core.js"></script>
+<script>
+(function(){
+    if(location.protocol === 'file:'){
+        var div = document.createElement('div');
+        div.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#b83a2a;color:#fff;padding:12px 16px;text-align:center;font-size:14px;line-height:1.6;';
+        div.innerHTML = '⚠️ 检测到您正在用 <b>file://</b> 协议直接打开文件，这会导致部分功能（如企业微信通知）无法正常工作。<br>请使用本地服务器访问：在文件夹内运行 <code style="background:rgba(255,255,255,0.2);padding:2px 6px;border-radius:4px;">python -m http.server</code> 或 <code style="background:rgba(255,255,255,0.2);padding:2px 6px;border-radius:4px;">npx serve</code>，然后用 <b>http://localhost</b> 访问。';
+        document.body.appendChild(div);
+    }
+})();
+</script>
+</body>
+</html>

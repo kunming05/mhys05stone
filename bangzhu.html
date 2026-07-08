@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>帮助 · 梅花易数</title>
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+    <nav class="nav-main">
+        <div class="nav-inner">
+            <div class="nav-brand">
+                <span class="nav-logo">易</span>
+                <span class="nav-title">梅花易数</span>
+            </div>
+            <div class="nav-links">
+                <a href="index.html">首页</a>
+                <a href="qigua.html">起卦</a>
+                <a href="mingli.html">命理</a>
+                <a href="ziwei.html">紫微</a>
+                <a href="lishi.html">历史</a>
+                <a href="bangzhu.html" class="active">帮助</a>
+            </div>
+        </div>
+    </nav>
+    <main class="container">
+        <h2 class="page-title">使用帮助</h2>
+        <div class="card-white space-y-4">
+            <section>
+                <h3 style="font-family:var(--font-serif);font-size:20px;margin-bottom:8px;color:var(--xuan-dark);">梅花易数简介</h3>
+                <p style="color:var(--xuan-brown);line-height:1.8;">梅花易数由宋代邵雍（邵康节）所创，以《易经》八卦为基础，强调"象数"之理。通过观察时间、数字、声音、方位等随机现象起卦，推断事物发展趋势。</p>
+            </section>
+            <section>
+                <h3 style="font-family:var(--font-serif);font-size:20px;margin-bottom:8px;color:var(--xuan-dark);">起卦方式</h3>
+                <div style="color:var(--xuan-brown);line-height:1.8;">
+                    <p><b style="color:var(--xuan-dark);">时间起卦</b>：以当前或指定的年、月、日、时之数求卦。上卦 = (年+月+日) % 8，下卦 = (年+月+日+时) % 8，动爻 = (年+月+日+时) % 6。</p>
+                    <p style="margin-top:8px;"><b style="color:var(--xuan-dark);">铜钱起卦</b>：模拟三枚铜钱摇六次，记录每次结果。三背为老阳（阳动），两背一字为少阴（阴静），一背两字为少阳（阳静），三字为老阴（阴动）。自下而上装卦。</p>
+                    <p style="margin-top:8px;"><b style="color:var(--xuan-dark);">数字起卦</b>：输入两个数字（1-9999），分别求上卦和下卦。动爻可自动计算或手动指定。</p>
+                    <p style="margin-top:8px;"><b style="color:var(--xuan-dark);">方位起卦</b>：以来人所站方位为上卦，当前时辰数为下卦。</p>
+                    <p style="margin-top:8px;"><b style="color:var(--xuan-dark);">声音起卦</b>：以闻声之数为上卦，加时数为下卦。</p>
+                    <p style="margin-top:8px;"><b style="color:var(--xuan-dark);">见物起卦</b>：以所见之物所属八卦为上卦，物所在方位为下卦。</p>
+                </div>
+            </section>
+            <section>
+                <h3 style="font-family:var(--font-serif);font-size:20px;margin-bottom:8px;color:var(--xuan-dark);">六爻解读</h3>
+                <p style="color:var(--xuan-brown);line-height:1.8;"><b>本卦</b>主当前现状，<b>变卦</b>主未来趋势，<b>互卦</b>主事情过程。动爻所在位置揭示关键变化时机。体卦代表问卦者（主），用卦代表所问之事（客），通过体用生克关系判断吉凶。</p>
+            </section>
+            <section>
+                <h3 style="font-family:var(--font-serif);font-size:20px;margin-bottom:8px;color:var(--xuan-dark);">铜钱规则详解</h3>
+                <div style="color:var(--xuan-brown);line-height:1.8;">
+                    <p>铜钱有字的一面为"字面"（正面，属阴），有图案/满文的一面为"背面"（反面，属阳）。</p>
+                    <ul style="margin-top:8px;padding-left:20px;">
+                        <li>三背（三阳）= 老阳 = 阳爻动 ○</li>
+                        <li>两背一字（两阳一阴）= 少阴 = 阴静 - -</li>
+                        <li>一背两字（一阳两阴）= 少阳 = 阳静 —</li>
+                        <li>三字（三阴）= 老阴 = 阴动 ×</li>
+                    </ul>
+                </div>
+            </section>
+            <section>
+                <h3 style="font-family:var(--font-serif);font-size:20px;margin-bottom:8px;color:var(--xuan-dark);">免责声明</h3>
+                <p style="color:var(--xuan-brown);line-height:1.8;">本工具仅供文化研究、个人学习参考之用，基于传统易学理论构建，不构成任何形式的决策建议、医疗建议、法律建议或投资指导。请理性看待，切勿迷信。</p>
+            </section>
+        </div>
+    </main>
+    <footer class="footer"><p>梅花易数 · 易学工具</p></footer>
+    <script src="js/meihua-core.js"></script>
+</body>
+</html>

@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>起卦 · 梅花易数</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <style>
+        .method-tabs { display: flex; gap: 8px; overflow-x: auto; padding: 8px 0; margin-bottom: 16px; border-bottom: 1px solid var(--xuan-border); -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+        .method-tabs::-webkit-scrollbar { display: none; }
+        .method-tab { padding: 8px 16px; border-radius: 16px; font-size: 14px; border: 1px solid var(--xuan-border); background: #fff; color: var(--xuan-brown); cursor: pointer; white-space: nowrap; transition: all 0.2s; flex-shrink: 0; -webkit-tap-highlight-color: transparent; }
+        .method-tab:hover { border-color: var(--xuan-green); color: var(--xuan-green); }
+        .method-tab.active { background: var(--xuan-green); color: #fff; border-color: var(--xuan-green); }
+        .method-panel { display: none; }
+        .method-panel.active { display: block; }
+        .coin-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .dir-btn, .zhi-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px 8px; border: 1px solid var(--xuan-border); border-radius: 10px; background: #fff; cursor: pointer; transition: all 0.2s; font-size: 14px; min-height: 64px; text-align: center; -webkit-tap-highlight-color: transparent; }
+        .dir-btn:hover, .zhi-btn:hover { border-color: var(--xuan-green); background: rgba(45,90,61,0.04); }
+        .dir-btn.selected, .zhi-btn.selected { border-color: var(--xuan-green); background: rgba(45,90,61,0.08); box-shadow: 0 0 0 2px rgba(45,90,61,0.15); }
+        .dir-btn .small { font-size: 12px; color: var(--xuan-brown); margin-top: 2px; }
+        .wu-btn { display: block; width: 100%; text-align: left; padding: 10px 14px; border: 1px solid var(--xuan-border); border-radius: 10px; background: #fff; cursor: pointer; transition: all 0.2s; font-size: 13px; margin-bottom: 6px; -webkit-tap-highlight-color: transparent; }
+        .wu-btn:hover { border-color: var(--xuan-green); background: rgba(45,90,61,0.04); }
+        .wu-btn.selected { border-color: var(--xuan-green); background: rgba(45,90,61,0.08); box-shadow: 0 0 0 2px rgba(45,90,61,0.15); }
+        .shiqing-btn { padding: 6px 14px; border: 1px solid var(--xuan-border); border-radius: 16px; background: #fff; color: var(--xuan-brown); font-size: 13px; cursor: pointer; transition: all 0.2s; -webkit-tap-highlight-color: transparent; }
+        .shiqing-btn:hover { border-color: var(--xuan-green); color: var(--xuan-green); }
+        .shiqing-btn.selected { background: var(--xuan-green); color: #fff; border-color: var(--xuan-green); }
+        #result-area { margin-top: 24px; }
+        .back-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+        .tab-btn { padding: 8px 16px; border: none; background: transparent; color: var(--xuan-brown); font-size: 14px; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap; }
+        .tab-btn.active { color: var(--xuan-green); border-bottom-color: var(--xuan-green); font-weight: 500; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        @media (max-width: 640px) { 
+            .coin-grid { grid-template-columns: repeat(2, 1fr); } 
+            .method-tab { padding: 6px 12px; font-size: 13px; }
+            .dir-btn, .zhi-btn { padding: 10px 6px; font-size: 12px; min-height: 56px; }
+            .wu-btn { padding: 8px 10px; font-size: 12px; }
+            .back-bar { gap: 8px; }
+            .tab-btn { padding: 6px 10px; font-size: 13px; }
+        }
+        @media (max-width: 480px) {
+            .coin-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+            .method-tab { padding: 5px 10px; font-size: 12px; }
+            .dir-btn, .zhi-btn { padding: 8px 4px; font-size: 11px; min-height: 48px; }
+            .wu-btn { padding: 8px 10px; font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav-main">
+        <div class="nav-inner">
+            <div class="nav-brand"><span class="nav-logo">易</span><span class="nav-title">梅花易数</span></div>
+            <div class="nav-links">
+                <a href="index.html">首页</a>
+                <a href="qigua.html" class="active">起卦</a>
+                <a href="mingli.html">命理</a>
+                <a href="ziwei.html">紫微</a>
+                <a href="lishi.html">历史</a>
+                <a href="bangzhu.html">帮助</a>
+            </div>
+        </div>
+    </nav>
+    <main class="container">
+        <h2 class="page-title text-center mb-4">起卦</h2>
+
+        <div class="method-tabs" id="method-tabs">
+            <button onclick="switchMethod('time')" class="method-tab active" data-method="time">时间起卦</button>
+            <button onclick="switchMethod('coin')" class="method-tab" data-method="coin">铜钱起卦</button>
+            <button onclick="switchMethod('number')" class="method-tab" data-method="number">数字起卦</button>
+            <button onclick="switchMethod('direction')" class="method-tab" data-method="direction">方位起卦</button>
+            <button onclick="switchMethod('sound')" class="method-tab" data-method="sound">声音起卦</button>
+            <button onclick="switchMethod('object')" class="method-tab" data-method="object">见物起卦</button>
+        </div>
+
+        <!-- 时间起卦 -->
+        <div id="panel-time" class="method-panel active">
+            <div class="card-white max-w-2xl mx-auto">
+                <div class="mb-6">
+                    <label class="block font-medium mb-3">选择时间</label>
+                    <div class="flex gap-4 mb-4">
+                        <label class="flex items-center gap-1.5 cursor-pointer">
+                            <input type="radio" name="time-mode" value="now" checked onchange="timeToggleMode()" />
+                            <span>当前时间</span>
+                        </label>
+                        <label class="flex items-center gap-1.5 cursor-pointer">
+                            <input type="radio" name="time-mode" value="custom" onchange="timeToggleMode()" />
+                            <span>指定时间</span>
+                        </label>
+                    </div>
+                    <div id="time-custom-inputs" class="hidden grid grid-cols-5 gap-2">
+                        <input type="number" id="t-year" placeholder="年" />
+                        <input type="number" id="t-month" placeholder="月" min="1" max="12" />
+                        <input type="number" id="t-day" placeholder="日" min="1" max="31" />
+                        <input type="number" id="t-hour" placeholder="时" min="0" max="23" />
+                        <input type="number" id="t-minute" placeholder="分" min="0" max="59" />
+                    </div>
+                    <div id="time-current-display" class="text-xuan-green text-sm mt-2"></div>
+                </div>
+                <div class="mb-6">
+                    <label class="block font-medium mb-2">所问事情</label>
+                    <div class="flex flex-wrap gap-2 mb-2">
+                        <button onclick="timeSelectShiqing(this,'财运')" class="shiqing-btn">财运</button>
+                        <button onclick="timeSelectShiqing(this,'事业')" class="shiqing-btn">事业</button>
+                        <button onclick="timeSelectShiqing(this,'感情')" class="shiqing-btn">感情</button>
+                        <button onclick="timeSelectShiqing(this,'健康')" class="shiqing-btn">健康</button>
+                        <button onclick="timeSelectShiqing(this,'考试')" class="shiqing-btn">考试</button>
+                        <button onclick="timeSelectShiqing(this,'出行')" class="shiqing-btn">出行</button>
+                        <button onclick="timeSelectShiqing(this,'诉讼')" class="shiqing-btn">诉讼</button>
+                        <button onclick="timeSelectShiqing(this,'寻人')" class="shiqing-btn">寻人</button>
+                        <button onclick="timeSelectShiqing(this,'失物')" class="shiqing-btn">失物</button>
+                        <button onclick="timeSelectShiqing(this,'其他')" class="shiqing-btn">其他</button>
+                    </div>
+                    <input type="text" id="time-shiqing" placeholder="或输入具体事情..." class="w-full" />
+                </div>
+                <button onclick="doTimeQiGua()" class="btn-primary w-full py-3 text-lg">起卦</button>
+            </div>
+        </div>
+
+        <!-- 铜钱起卦 -->
+        <div id="panel-coin" class="method-panel">
+            <div class="max-w-2xl mx-auto">
+                <div class="card-white mb-4">
+                    <details>
+                        <summary class="cursor-pointer font-medium">铜钱规则（点击展开）</summary>
+                        <div class="mt-3 text-sm text-xuan-brown space-y-1">
+                            <p>• 三枚铜钱摇六次，记录每次结果</p>
+                            <p>• 三背（老阳）→ 阳动 ○ &nbsp; 两背一字（少阴）→ 阴静 - -</p>
+                            <p>• 一背两字（少阳）→ 阳静 — &nbsp; 三字（老阴）→ 阴动 ×</p>
+                            <p>• 自下而上装卦，第一次为初爻</p>
+                        </div>
+                    </details>
+                </div>
+                <div class="card-white">
+                    <div id="coin-steps" class="space-y-4"></div>
+                    <div id="coin-preview" class="mt-4 p-3 bg-xuan-paper rounded-lg hidden">
+                        <p class="text-sm text-xuan-brown text-center">预览（自下而上）</p>
+                        <div id="coin-preview-lines" class="w-32 mx-auto"></div>
+                    </div>
+                    <div class="mt-4">
+                        <label class="block font-medium mb-2">所问事情（可选）</label>
+                        <input type="text" id="coin-shiqing" placeholder="输入所问事情..." class="w-full" />
+                    </div>
+                    <button id="coin-submit" onclick="doCoinQiGua()" class="btn-primary w-full py-3 text-lg mt-4" disabled>完成起卦</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 数字起卦 -->
+        <div id="panel-number" class="method-panel">
+            <div class="card-white max-w-2xl mx-auto">
+                <div class="space-y-4 mb-6">
+                    <div>
+                        <label class="block font-medium">上卦数 <span class="text-sm text-xuan-brown">(1-9999，留空随机)</span></label>
+                        <input type="number" id="n-shang" placeholder="输入上卦数" min="1" max="9999" class="w-full" />
+                    </div>
+                    <div>
+                        <label class="block font-medium">下卦数 <span class="text-sm text-xuan-brown">(1-9999，留空随机)</span></label>
+                        <input type="number" id="n-xia" placeholder="输入下卦数" min="1" max="9999" class="w-full" />
+                    </div>
+                    <div>
+                        <label class="block font-medium">动爻数 <span class="text-sm text-xuan-brown">(1-9999，留空自动)</span></label>
+                        <input type="number" id="n-dong" placeholder="输入动爻数（可选）" min="1" max="9999" class="w-full" />
+                    </div>
+                </div>
+                <div class="mb-6">
+                    <label class="block font-medium">所问事情（可选）</label>
+                    <input type="text" id="number-shiqing" placeholder="输入所问事情..." class="w-full" />
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="randomNumbers()" class="btn-outline flex-1">随机数字</button>
+                    <button onclick="doNumberQiGua()" class="btn-primary flex-1">起卦</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 方位起卦 -->
+        <div id="panel-direction" class="method-panel">
+            <div class="max-w-2xl mx-auto">
+                <div class="card-white mb-4">
+                    <details>
+                        <summary class="cursor-pointer font-medium">方位起卦规则（点击展开）</summary>
+                        <div class="mt-3 text-sm text-xuan-brown space-y-1">
+                            <p>• 以来人所站方位为上卦（后天八卦方位）</p>
+                            <p>• 以当前时辰数取为下卦</p>
+                            <p>• 动爻 = (方位卦数 + 时辰卦数 + 时辰数) % 6</p>
+                            <p>• 后天八卦：北坎、东北艮、东震、东南巽、南离、西南坤、西兑、西北乾</p>
+                        </div>
+                    </details>
+                </div>
+                <div class="card-white">
+                    <div class="mb-6">
+                        <label class="block font-medium mb-3">选择来人方位</label>
+                        <div class="grid grid-cols-4 gap-2">
+                            <button onclick="dirSelectDir(this,'北')" class="dir-btn">北<br><span class="small">坎水</span></button>
+                            <button onclick="dirSelectDir(this,'东北')" class="dir-btn">东北<br><span class="small">艮山</span></button>
+                            <button onclick="dirSelectDir(this,'东')" class="dir-btn">东<br><span class="small">震雷</span></button>
+                            <button onclick="dirSelectDir(this,'东南')" class="dir-btn">东南<br><span class="small">巽风</span></button>
+                            <button onclick="dirSelectDir(this,'南')" class="dir-btn">南<br><span class="small">离火</span></button>
+                            <button onclick="dirSelectDir(this,'西南')" class="dir-btn">西南<br><span class="small">坤地</span></button>
+                            <button onclick="dirSelectDir(this,'西')" class="dir-btn">西<br><span class="small">兑泽</span></button>
+                            <button onclick="dirSelectDir(this,'西北')" class="dir-btn">西北<br><span class="small">乾天</span></button>
+                        </div>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block font-medium mb-3">选择时辰</label>
+                        <div class="grid grid-cols-6 gap-2">
+                            <button onclick="dirSelectZhi(this,1)" class="zhi-btn">子</button>
+                            <button onclick="dirSelectZhi(this,2)" class="zhi-btn">丑</button>
+                            <button onclick="dirSelectZhi(this,3)" class="zhi-btn">寅</button>
+                            <button onclick="dirSelectZhi(this,4)" class="zhi-btn">卯</button>
+                            <button onclick="dirSelectZhi(this,5)" class="zhi-btn">辰</button>
+                            <button onclick="dirSelectZhi(this,6)" class="zhi-btn">巳</button>
+                            <button onclick="dirSelectZhi(this,7)" class="zhi-btn">午</button>
+                            <button onclick="dirSelectZhi(this,8)" class="zhi-btn">未</button>
+                            <button onclick="dirSelectZhi(this,9)" class="zhi-btn">申</button>
+                            <button onclick="dirSelectZhi(this,10)" class="zhi-btn">酉</button>
+                            <button onclick="dirSelectZhi(this,11)" class="zhi-btn">戌</button>
+                            <button onclick="dirSelectZhi(this,12)" class="zhi-btn">亥</button>
+                        </div>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block font-medium mb-2">所问事情（可选）</label>
+                        <input type="text" id="dir-shiqing" placeholder="输入所问事情..." class="w-full" />
+                    </div>
+                    <button id="dir-submit" onclick="doDirQiGua()" class="btn-primary w-full py-3 text-lg" disabled>起卦</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 声音起卦 -->
+        <div id="panel-sound" class="method-panel">
+            <div class="max-w-2xl mx-auto">
+                <div class="card-white mb-4">
+                    <details>
+                        <summary class="cursor-pointer font-medium">声音起卦规则（点击展开）</summary>
+                        <div class="mt-3 text-sm text-xuan-brown space-y-1">
+                            <p>• 凡闻声音，数得声数起作上卦，加时数配作下卦</p>
+                            <p>• 若有间隔（如两声之间有停顿），间隔前为上卦，间隔后为下卦</p>
+                            <p>• 动爻 = (上卦数 + 下卦数 + 时辰数) % 6</p>
+                            <p>• 声数：如听到三声，则上卦数为3；听到七声，则上卦数为7</p>
+                        </div>
+                    </details>
+                </div>
+                <div class="card-white">
+                    <div class="mb-4">
+                        <label class="flex items-center gap-2 cursor-pointer mb-4">
+                            <input type="checkbox" id="sound-interval" onchange="soundToggleInterval()" />
+                            <span>声音有间隔（间隔前为上卦，间隔后为下卦）</span>
+                        </label>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block font-medium" id="sound-shang-label">上卦声数（听到几声）</label>
+                        <input type="number" id="sound-shang" placeholder="输入声数（如3）" min="1" max="999" class="w-full" oninput="soundCheckReady()" />
+                    </div>
+                    <div class="mb-4" id="sound-xia-box">
+                        <label class="block font-medium">下卦声数（间隔后几声）</label>
+                        <input type="number" id="sound-xia" placeholder="输入声数" min="1" max="999" class="w-full" oninput="soundCheckReady()" />
+                    </div>
+                    <div class="mb-6">
+                        <label class="block font-medium mb-3">选择时辰</label>
+                        <div class="grid grid-cols-6 gap-2">
+                            <button onclick="soundSelectZhi(this,1)" class="zhi-btn">子</button>
+                            <button onclick="soundSelectZhi(this,2)" class="zhi-btn">丑</button>
+                            <button onclick="soundSelectZhi(this,3)" class="zhi-btn">寅</button>
+                            <button onclick="soundSelectZhi(this,4)" class="zhi-btn">卯</button>
+                            <button onclick="soundSelectZhi(this,5)" class="zhi-btn">辰</button>
+                            <button onclick="soundSelectZhi(this,6)" class="zhi-btn">巳</button>
+                            <button onclick="soundSelectZhi(this,7)" class="zhi-btn">午</button>
+                            <button onclick="soundSelectZhi(this,8)" class="zhi-btn">未</button>
+                            <button onclick="soundSelectZhi(this,9)" class="zhi-btn">申</button>
+                            <button onclick="soundSelectZhi(this,10)" class="zhi-btn">酉</button>
+                            <button onclick="soundSelectZhi(this,11)" class="zhi-btn">戌</button>
+                            <button onclick="soundSelectZhi(this,12)" class="zhi-btn">亥</button>
+                        </div>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block font-medium mb-2">所问事情（可选）</label>
+                        <input type="text" id="sound-shiqing" placeholder="输入所问事情..." class="w-full" />
+                    </div>
+                    <button id="sound-submit" onclick="doSoundQiGua()" class="btn-primary w-full py-3 text-lg" disabled>起卦</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 见物起卦 -->
+        <div id="panel-object" class="method-panel">
+            <div class="max-w-2xl mx-auto">
+                <div class="card-white mb-4">
+                    <details>
+                        <summary class="cursor-pointer font-medium">见物起卦规则（点击展开）</summary>
+                        <div class="mt-3 text-sm text-xuan-brown space-y-1">
+                            <p>• 以所见之物所属八卦为上卦（按《梅花易数》万物属类）</p>
+                            <p>• 以物所在之方位为下卦（后天八卦方位）</p>
+                            <p>• 动爻 = (上卦数 + 下卦数 + 时辰数) % 6</p>
+                            <p>• 例：见一老人从南方来，老人属乾，南方属离，则上卦乾、下卦离</p>
+                        </div>
+                    </details>
+                </div>
+                <div class="card-white">
+                    <div class="mb-6">
+                        <label class="block font-medium mb-3">选择所见之物（万物属类）</label>
+                        <div class="space-y-2">
+                            <button onclick="objSelectWu(this,'天')" class="wu-btn">乾类：天、父、老人、官贵、头、骨、马、金、玉、圆物</button>
+                            <button onclick="objSelectWu(this,'地')" class="wu-btn">坤类：地、母、老妇、土、牛、布帛、方物、黄色、瓦器</button>
+                            <button onclick="objSelectWu(this,'雷')" class="wu-btn">震类：雷、长男、足、龙、百虫、竹、草木、青绿色、树</button>
+                            <button onclick="objSelectWu(this,'风')" class="wu-btn">巽类：风、长女、鸡、股、百禽、百草、香气、绳、羽毛</button>
+                            <button onclick="objSelectWu(this,'水')" class="wu-btn">坎类：水、雨、沟渎、隐伏、中男、耳、猪、血</button>
+                            <button onclick="objSelectWu(this,'火')" class="wu-btn">离类：火、日、中女、目、雉、甲胄、戈兵、大腹</button>
+                            <button onclick="objSelectWu(this,'山')" class="wu-btn">艮类：山、少男、手、犬、径、路、小石、门阙、果</button>
+                            <button onclick="objSelectWu(this,'泽')" class="wu-btn">兑类：泽、少女、口、羊、巫、口舌、毁折、斧</button>
+                        </div>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block font-medium mb-3">选择物所在方位</label>
+                        <div class="grid grid-cols-4 gap-2">
+                            <button onclick="objSelectDir(this,'北')" class="dir-btn">北<br><span class="small">坎</span></button>
+                            <button onclick="objSelectDir(this,'东北')" class="dir-btn">东北<br><span class="small">艮</span></button>
+                            <button onclick="objSelectDir(this,'东')" class="dir-btn">东<br><span class="small">震</span></button>
+                            <button onclick="objSelectDir(this,'东南')" class="dir-btn">东南<br><span class="small">巽</span></button>
+                            <button onclick="objSelectDir(this,'南')" class="dir-btn">南<br><span class="small">离</span></button>
+                            <button onclick="objSelectDir(this,'西南')" class="dir-btn">西南<br><span class="small">坤</span></button>
+                            <button onclick="objSelectDir(this,'西')" class="dir-btn">西<br><span class="small">兑</span></button>
+                            <button onclick="objSelectDir(this,'西北')" class="dir-btn">西北<br><span class="small">乾</span></button>
+                        </div>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block font-medium mb-3">选择时辰</label>
+                        <div class="grid grid-cols-6 gap-2">
+                            <button onclick="objSelectZhi(this,1)" class="zhi-btn">子</button>
+                            <button onclick="objSelectZhi(this,2)" class="zhi-btn">丑</button>
+                            <button onclick="objSelectZhi(this,3)" class="zhi-btn">寅</button>
+                            <button onclick="objSelectZhi(this,4)" class="zhi-btn">卯</button>
+                            <button onclick="objSelectZhi(this,5)" class="zhi-btn">辰</button>
+                            <button onclick="objSelectZhi(this,6)" class="zhi-btn">巳</button>
+                            <button onclick="objSelectZhi(this,7)" class="zhi-btn">午</button>
+                            <button onclick="objSelectZhi(this,8)" class="zhi-btn">未</button>
+                            <button onclick="objSelectZhi(this,9)" class="zhi-btn">申</button>
+                            <button onclick="objSelectZhi(this,10)" class="zhi-btn">酉</button>
+                            <button onclick="objSelectZhi(this,11)" class="zhi-btn">戌</button>
+                            <button onclick="objSelectZhi(this,12)" class="zhi-btn">亥</button>
+                        </div>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block font-medium mb-2">所问事情（可选）</label>
+                        <input type="text" id="obj-shiqing" placeholder="输入所问事情..." class="w-full" />
+                    </div>
+                    <button id="obj-submit" onclick="doObjQiGua()" class="btn-primary w-full py-3 text-lg" disabled>起卦</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 结果区域 -->
+        <div id="result-area" class="hidden">
+            <div class="back-bar">
+                <button onclick="backToMethods()" class="btn-outline">← 重新起卦</button>
+                <h3 class="page-title" style="font-size:20px;margin:0">卦象结果（六爻详解）</h3>
+                <button onclick="saveCurrentResult()" class="btn-outline">保存记录</button>
+            </div>
+            <div id="result-content"></div>
+        </div>
+    </main>
+    <footer class="footer"><p>梅花易数 · 易学工具</p></footer>
+
+    <script src="js/gua-data.js"></script>
+    <script src="js/meihua-core.js"></script>
+    <script>
+        function switchMethod(method) {
+            document.querySelectorAll('.method-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector('.method-tab[data-method="'+method+'"]')?.classList.add('active');
+            document.querySelectorAll('.method-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById('panel-'+method).classList.add('active');
+            if (method === 'coin') initCoinSteps();
+        }
+        function backToMethods() {
+            document.getElementById('result-area').classList.add('hidden');
+            document.getElementById('method-tabs').scrollIntoView({behavior:'smooth'});
+        }
+        function showResult(result) {
+            sessionStorage.setItem('currentResult', JSON.stringify(result));
+            document.getElementById('result-area').classList.remove('hidden');
+            document.getElementById('result-area').scrollIntoView({behavior:'smooth'});
+            if (typeof window.renderResult === 'function') {
+                window.renderResult(result);
+            } else {
+                document.getElementById('result-content').innerHTML = '<p class="text-xuan-red text-center py-10">渲染函数未加载</p>';
+            }
+            // 自动保存起卦记录（保存完整数据以便查看）
+            try {
+                if (typeof window.saveHistory === 'function') {
+                    const record = {
+                        method: result.method,
+                        timeInfo: result.timeInfo,
+                        qiShu: result.qiShu,
+                        calc: result.calc,
+                        benGua: {
+                            name: result.benGua?.name,
+                            shang: result.benGua?.shang ? {
+                                name: result.benGua.shang.name,
+                                symbol: result.benGua.shang.symbol,
+                                nature: result.benGua.shang.nature,
+                                wuxing: result.benGua.shang.wuxing,
+                                y: result.benGua.shang.y
+                            } : null,
+                            xia: result.benGua?.xia ? {
+                                name: result.benGua.xia.name,
+                                symbol: result.benGua.xia.symbol,
+                                nature: result.benGua.xia.nature,
+                                wuxing: result.benGua.xia.wuxing,
+                                y: result.benGua.xia.y
+                            } : null,
+                            yaoList: result.benGua?.yaoList,
+                            dongYao: result.benGua?.dongYao,
+                            dongYaoList: result.benGua?.dongYaoList
+                        },
+                        bianGua: {
+                            name: result.bianGua?.name,
+                            shang: result.bianGua?.shang ? {
+                                name: result.bianGua.shang.name,
+                                symbol: result.bianGua.shang.symbol,
+                                nature: result.bianGua.shang.nature,
+                                wuxing: result.bianGua.shang.wuxing,
+                                y: result.bianGua.shang.y
+                            } : null,
+                            xia: result.bianGua?.xia ? {
+                                name: result.bianGua.xia.name,
+                                symbol: result.bianGua.xia.symbol,
+                                nature: result.bianGua.xia.nature,
+                                wuxing: result.bianGua.xia.wuxing,
+                                y: result.bianGua.xia.y
+                            } : null,
+                            yaoList: result.bianGua?.yaoList
+                        },
+                        huGua: {
+                            name: result.huGua?.name,
+                            shang: result.huGua?.shang ? {
+                                name: result.huGua.shang.name,
+                                symbol: result.huGua.shang.symbol,
+                                nature: result.huGua.shang.nature,
+                                wuxing: result.huGua.shang.wuxing,
+                                y: result.huGua.shang.y
+                            } : null,
+                            xia: result.huGua?.xia ? {
+                                name: result.huGua.xia.name,
+                                symbol: result.huGua.xia.symbol,
+                                nature: result.huGua.xia.nature,
+                                wuxing: result.huGua.xia.wuxing,
+                                y: result.huGua.xia.y
+                            } : null,
+                            yaoList: result.huGua?.yaoList
+                        },
+                        tiYong: result.tiYong,
+                        shiqing: result.shiqing,
+                        guaQi: result.guaQi,
+                        yingQi: result.yingQi
+                    };
+                    const id = window.saveHistory(record);
+                    if (id) console.log('起卦记录已自动保存，编号：' + id);
+                }
+            } catch(e) { console.error('自动保存失败', e); }
+        }
+
+        // 时间起卦
+        function timeToggleMode() {
+            const mode = document.querySelector('input[name="time-mode"]:checked').value;
+            document.getElementById('time-custom-inputs').classList.toggle('hidden', mode === 'now');
+            if (mode === 'now') {
+                const n = new Date();
+                document.getElementById('time-current-display').textContent = 
+                    '当前时间：'+n.getFullYear()+'年'+(n.getMonth()+1)+'月'+n.getDate()+'日 '+String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
+            } else {
+                document.getElementById('time-current-display').textContent = '';
+            }
+        }
+        function timeSelectShiqing(btn, shiqing) {
+            document.querySelectorAll('#panel-time .shiqing-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            document.getElementById('time-shiqing').value = '';
+            window._timeSelectedShiqing = shiqing;
+        }
+        function doTimeQiGua() {
+            const mode = document.querySelector('input[name="time-mode"]:checked').value;
+            let y, m, d, h, min;
+            if (mode === 'now') {
+                const n = new Date();
+                y = n.getFullYear(); m = n.getMonth() + 1; d = n.getDate(); h = n.getHours(); min = n.getMinutes();
+            } else {
+                y = parseInt(document.getElementById('t-year').value);
+                m = parseInt(document.getElementById('t-month').value);
+                d = parseInt(document.getElementById('t-day').value);
+                h = parseInt(document.getElementById('t-hour').value) || 0;
+                min = parseInt(document.getElementById('t-minute').value) || 0;
+                if (!y || !m || !d) { alert('请填写完整的日期'); return; }
+            }
+            let shiqing = document.getElementById('time-shiqing').value.trim();
+            if (!shiqing && window._timeSelectedShiqing) shiqing = window._timeSelectedShiqing;
+            const result = window.qiGuaByTime(y, m, d, h, min, shiqing || '');
+            showResult(result);
+        }
+
+        // 铜钱起卦
+        let coinResults = [null, null, null, null, null, null];
+        const yaoNames = ["初爻","二爻","三爻","四爻","五爻","上爻"];
+        function initCoinSteps() {
+            const container = document.getElementById('coin-steps');
+            container.innerHTML = '';
+            coinResults = [null, null, null, null, null, null];
+            for (let i = 0; i < 6; i++) {
+                const div = document.createElement('div');
+                div.className = 'border border-xuan-border rounded-lg p-4';
+                div.id = 'coin-step-'+i;
+                div.innerHTML = '<div class="flex items-center justify-between mb-3"><span class="font-medium">第'+(i+1)+'次 —— '+yaoNames[i]+'</span><span class="coin-status text-sm text-xuan-brown"></span></div><div class="coin-grid"><button onclick="coinSelect('+i+',1,true,this)" class="coin-option">三背<span class="small">阳动 ○</span></button><button onclick="coinSelect('+i+',0,false,this)" class="coin-option">两背一字<span class="small">阴静 - -</span></button><button onclick="coinSelect('+i+',1,false,this)" class="coin-option">一背两字<span class="small">阳静 —</span></button><button onclick="coinSelect('+i+',0,true,this)" class="coin-option">三字<span class="small">阴动 ×</span></button></div>';
+                container.appendChild(div);
+            }
+            coinUpdatePreview();
+            document.getElementById('coin-submit').disabled = true;
+        }
+        function coinSelect(idx, value, dong, btn) {
+            coinResults[idx] = { value, dong };
+            const step = document.getElementById('coin-step-'+idx);
+            step.querySelectorAll('.coin-option').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            step.querySelector('.coin-status').textContent = dong ? (value ? '阳动 ○' : '阴动 ×') : (value ? '阳静 —' : '阴静 - -');
+            coinUpdatePreview();
+            document.getElementById('coin-submit').disabled = coinResults.some(r => r === null);
+        }
+        function coinUpdatePreview() {
+            const preview = document.getElementById('coin-preview');
+            const lines = document.getElementById('coin-preview-lines');
+            const done = coinResults.filter(r => r !== null);
+            if (done.length === 0) { preview.classList.add('hidden'); return; }
+            preview.classList.remove('hidden');
+            lines.innerHTML = '';
+            for (let i = done.length - 1; i >= 0; i--) {
+                const r = done[i];
+                const div = document.createElement('div');
+                div.className = 'yao-line-container';
+                if (r.value === 1) {
+                    div.innerHTML = '<div class="yao-yang '+(r.dong?'yao-dong':'')+'" '+(r.dong?'data-mark="○"':'')+'></div>';
+                } else {
+                    div.innerHTML = '<div class="yao-yin '+(r.dong?'yao-dong':'')+'" '+(r.dong?'data-mark="×"':'')+'><span></span><span></span></div>';
+                }
+                lines.appendChild(div);
+            }
+        }
+        function doCoinQiGua() {
+            const shiqing = document.getElementById('coin-shiqing').value.trim() || '';
+            const result = window.qiGuaByCoins(coinResults, shiqing);
+            showResult(result);
+        }
+
+        // 数字起卦
+        function randomNumbers() {
+            document.getElementById('n-shang').value = Math.floor(Math.random() * 9999) + 1;
+            document.getElementById('n-xia').value = Math.floor(Math.random() * 9999) + 1;
+            document.getElementById('n-dong').value = Math.floor(Math.random() * 9999) + 1;
+        }
+        function doNumberQiGua() {
+            let shang = parseInt(document.getElementById('n-shang').value);
+            let xia = parseInt(document.getElementById('n-xia').value);
+            let dong = parseInt(document.getElementById('n-dong').value) || 0;
+            if (!shang) shang = Math.floor(Math.random() * 9999) + 1;
+            if (!xia) xia = Math.floor(Math.random() * 9999) + 1;
+            const shiqing = document.getElementById('number-shiqing').value.trim() || '';
+            const result = window.qiGuaByNumber(shang, xia, dong, shiqing);
+            showResult(result);
+        }
+
+        // 方位起卦
+        let dirSelectedDir = null, dirSelectedZhi = null;
+        function dirSelectDir(btn, dir) {
+            dirSelectedDir = dir;
+            document.querySelectorAll('#panel-direction .dir-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            dirCheckReady();
+        }
+        function dirSelectZhi(btn, zhi) {
+            dirSelectedZhi = zhi;
+            document.querySelectorAll('#panel-direction .zhi-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            dirCheckReady();
+        }
+        function dirCheckReady() {
+            document.getElementById('dir-submit').disabled = !(dirSelectedDir && dirSelectedZhi);
+        }
+        function doDirQiGua() {
+            const shiqing = document.getElementById('dir-shiqing').value.trim() || '';
+            const result = window.qiGuaByDirection(dirSelectedDir, dirSelectedZhi, shiqing);
+            showResult(result);
+        }
+
+        // 声音起卦
+        let soundSelectedZhi = null;
+        function soundSelectZhi(btn, zhi) {
+            soundSelectedZhi = zhi;
+            document.querySelectorAll('#panel-sound .zhi-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            soundCheckReady();
+        }
+        function soundToggleInterval() {
+            const hasInterval = document.getElementById('sound-interval').checked;
+            document.getElementById('sound-xia-box').style.display = hasInterval ? 'block' : 'none';
+            document.getElementById('sound-shang-label').textContent = hasInterval ? '上卦声数（间隔前几声）' : '上卦声数（听到几声）';
+            soundCheckReady();
+        }
+        function soundCheckReady() {
+            const shang = parseInt(document.getElementById('sound-shang').value);
+            const hasInterval = document.getElementById('sound-interval').checked;
+            let xia = 0;
+            if (hasInterval) xia = parseInt(document.getElementById('sound-xia').value) || 0;
+            document.getElementById('sound-submit').disabled = !(shang && soundSelectedZhi && (!hasInterval || xia));
+        }
+        function doSoundQiGua() {
+            const shang = parseInt(document.getElementById('sound-shang').value);
+            const hasInterval = document.getElementById('sound-interval').checked;
+            const xia = hasInterval ? parseInt(document.getElementById('sound-xia').value) : 0;
+            const shiqing = document.getElementById('sound-shiqing').value.trim() || '';
+            const result = window.qiGuaBySound(shang, xia, soundSelectedZhi, hasInterval, shiqing);
+            showResult(result);
+        }
+
+        // 见物起卦
+        let objSelectedWu = null, objSelectedDir = null, objSelectedZhi = null;
+        function objSelectWu(btn, wu) {
+            objSelectedWu = wu;
+            document.querySelectorAll('.wu-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            objCheckReady();
+        }
+        function objSelectDir(btn, dir) {
+            objSelectedDir = dir;
+            document.querySelectorAll('#panel-object .dir-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            objCheckReady();
+        }
+        function objSelectZhi(btn, zhi) {
+            objSelectedZhi = zhi;
+            document.querySelectorAll('#panel-object .zhi-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            objCheckReady();
+        }
+        function objCheckReady() {
+            document.getElementById('obj-submit').disabled = !(objSelectedWu && objSelectedDir && objSelectedZhi);
+        }
+        function doObjQiGua() {
+            const shiqing = document.getElementById('obj-shiqing').value.trim() || '';
+            const result = window.qiGuaByObject(objSelectedWu, objSelectedDir, objSelectedZhi, shiqing);
+            showResult(result);
+        }
+
+        timeToggleMode();
+        soundToggleInterval();
+
+        // 页面加载时检查是否有从历史记录跳转过来的数据
+        (function() {
+            const saved = sessionStorage.getItem('currentResult');
+            if (saved) {
+                try {
+                    const record = JSON.parse(saved);
+                    if (record.benGua && record.bianGua) {
+                        document.getElementById('result-area').classList.remove('hidden');
+                        if (typeof window.renderResult === 'function') {
+                            window.renderResult(record);
+                        }
+                        sessionStorage.removeItem('currentResult');
+                    }
+                } catch(e) {
+                    console.error('恢复历史记录失败', e);
+                }
+            }
+        })();
+    </script>
+</body>
+</html>

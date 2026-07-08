@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>八字排盘 · 命理系统</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <style>
+        .bazi-form { max-width: 640px; margin: 0 auto; }
+        .bazi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+        .bazi-pillar { background: #fff; border: 1px solid var(--xuan-border); border-radius: 12px; padding: 16px; text-align: center; }
+        .bazi-pillar .label { font-size: 12px; color: var(--xuan-brown); margin-bottom: 4px; }
+        .bazi-pillar .gan { font-size: 26px; font-weight: 700; font-family: var(--font-serif); }
+        .bazi-pillar .zhi { font-size: 26px; font-weight: 700; font-family: var(--font-serif); margin-top: 4px; }
+        .bazi-pillar .nayin { font-size: 11px; color: var(--xuan-gold); margin-top: 4px; }
+        .bazi-pillar .shishen { font-size: 12px; color: var(--xuan-green); margin-top: 2px; }
+        .bazi-pillar .xunkong { font-size: 11px; color: var(--xuan-red); margin-top: 2px; }
+        .canggan-list { font-size: 12px; color: var(--xuan-brown); margin-top: 6px; line-height: 1.6; }
+        .dayun-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
+        .dayun-table th, .dayun-table td { border: 1px solid var(--xuan-border); padding: 8px; text-align: center; }
+        .dayun-table th { background: var(--xuan-paper); }
+        .shensha-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+        .shensha-tag { background: rgba(201,168,76,0.1); color: var(--xuan-gold); border: 1px solid var(--xuan-gold); border-radius: 12px; padding: 2px 10px; font-size: 12px; }
+        .info-row { display: flex; gap: 12px; flex-wrap: wrap; font-size: 13px; color: var(--xuan-brown); margin-bottom: 8px; }
+        .info-row span { background: var(--xuan-paper); padding: 4px 10px; border-radius: 6px; }
+        .highlight-box { background: rgba(45,90,61,0.06); border-left: 3px solid var(--xuan-green); padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 12px 0; }
+        .sub-nav { display: flex; gap: 4px; overflow-x: auto; padding: 8px 0; margin-bottom: 16px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+        .sub-nav::-webkit-scrollbar { display: none; }
+        .sub-nav a { padding: 6px 12px; border-radius: 16px; font-size: 13px; text-decoration: none; color: var(--xuan-brown); border: 1px solid var(--xuan-border); white-space: nowrap; cursor: pointer; flex-shrink: 0; -webkit-tap-highlight-color: transparent; }
+        .sub-nav a:hover, .sub-nav a.active { background: var(--xuan-green); color: #fff; border-color: var(--xuan-green); }
+        .tab-view { display: none; }
+        .tab-view.active { display: block; }
+        .ziwei-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .ziwei-gong { background: #fff; border: 1px solid var(--xuan-border); border-radius: 10px; padding: 12px; text-align: center; min-height: 120px; }
+        .ziwei-gong .gong-name { font-size: 13px; font-weight: 700; color: var(--xuan-dark); margin-bottom: 4px; }
+        .ziwei-gong .gong-zhi { font-size: 11px; color: var(--xuan-brown); margin-bottom: 6px; }
+        .ziwei-gong .stars { display: flex; flex-wrap: wrap; gap: 3px; justify-content: center; }
+        .ziwei-gong .star { font-size: 11px; padding: 2px 6px; border-radius: 8px; }
+        .star-main { background: rgba(201,168,76,0.15); color: var(--xuan-gold); border: 1px solid var(--xuan-gold); }
+        .star-aux { background: rgba(45,90,61,0.1); color: var(--xuan-green); border: 1px solid var(--xuan-green); }
+        .star-sha { background: rgba(184,58,42,0.1); color: var(--xuan-red); border: 1px solid var(--xuan-red); }
+        .ziwei-gong.ming { border-color: var(--xuan-green); box-shadow: 0 0 0 2px rgba(45,90,61,0.1); }
+        .ziwei-gong.shen { border-color: var(--xuan-gold); }
+
+        @media (max-width: 768px) { 
+            .bazi-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; } 
+            .bazi-pillar { padding: 12px 8px; }
+            .bazi-pillar .gan, .bazi-pillar .zhi { font-size: 22px; }
+            .dayun-table { font-size: 12px; }
+            .dayun-table th, .dayun-table td { padding: 6px 4px; }
+            .ziwei-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .ziwei-gong { padding: 10px 8px; min-height: 100px; }
+            .sub-nav a { padding: 5px 10px; font-size: 12px; }
+        }
+        @media (max-width: 480px) {
+            .bazi-grid { grid-template-columns: repeat(2, 1fr); }
+            .bazi-pillar .gan, .bazi-pillar .zhi { font-size: 20px; }
+            .canggan-list { font-size: 11px; }
+            .dayun-table { font-size: 11px; }
+            .dayun-table th, .dayun-table td { padding: 5px 3px; }
+            .info-row { gap: 6px; font-size: 12px; }
+            .info-row span { padding: 3px 8px; }
+            .ziwei-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+            .ziwei-gong { padding: 8px 6px; min-height: 90px; }
+            .ziwei-gong .gong-name { font-size: 12px; }
+            .ziwei-gong .star { font-size: 10px; padding: 1px 4px; }
+            .sub-nav a { padding: 5px 8px; font-size: 11px; }
+            .shensha-tag { font-size: 11px; padding: 2px 8px; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav-main">
+        <div class="nav-inner">
+            <div class="nav-brand"><span class="nav-logo">易</span><span class="nav-title">梅花易数</span></div>
+            <div class="nav-links">
+                <a href="index.html">首页</a>
+                <a href="qigua.html">起卦</a>
+                <a href="mingli.html">命理</a>
+                <a href="ziwei.html">紫微</a>
+                <a href="lishi.html">历史</a>
+                <a href="bangzhu.html">帮助</a>
+            </div>
+        </div>
+    </nav>
+    <main class="container">
+        <h2 class="page-title text-center mb-4">子平术 · 八字排盘</h2>
+
+        <!-- 输入区域 -->
+        <div id="input-section" class="card-white bazi-form">
+            <div class="space-y-4 mb-6">
+                <div class="flex gap-3">
+                    <div class="flex-1">
+                        <label class="block font-medium mb-2">姓名（可选）</label>
+                        <input type="text" id="b-name" placeholder="输入姓名" class="w-full" />
+                    </div>
+                    <div class="w-32">
+                        <label class="block font-medium mb-2">性别</label>
+                        <select id="b-gender" class="w-full" style="padding:10px 14px;border:1px solid var(--xuan-border);border-radius:8px;background:#fff;">
+                            <option value="男">男</option>
+                            <option value="女">女</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                    <div><label class="block font-medium mb-2">公历年</label><input type="number" id="b-year" class="w-full" /></div>
+                    <div><label class="block font-medium mb-2">月</label><input type="number" id="b-month" min="1" max="12" class="w-full" /></div>
+                    <div><label class="block font-medium mb-2">日</label><input type="number" id="b-day" min="1" max="31" class="w-full" /></div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div><label class="block font-medium mb-2">时（0-23）</label><input type="number" id="b-hour" min="0" max="23" class="w-full" /></div>
+                    <div><label class="block font-medium mb-2">分</label><input type="number" id="b-minute" min="0" max="59" value="0" class="w-full" /></div>
+                </div>
+                <div class="flex gap-3 items-center">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="b-true-time" checked />
+                        <span class="text-sm">使用真太阳时</span>
+                    </label>
+                </div>
+                <div>
+                    <label class="block font-medium mb-2">出生地经度（东经为正，如济南约117）</label>
+                    <input type="number" id="b-longitude" step="0.1" value="120" class="w-full" />
+                    <p class="text-xs text-xuan-brown mt-1">中国标准时基于东经120°，每差1度时间差4分钟</p>
+                </div>
+            </div>
+            <button onclick="doPaiPan()" class="btn-primary w-full py-3 text-lg">排盘</button>
+        </div>
+
+        <!-- 结果区域 -->
+        <div id="result-section" class="hidden">
+            <div class="sub-nav" id="sub-nav">
+                <a onclick="switchView('overview')" class="active" data-view="overview">总览</a>
+                <a onclick="switchView('pattern')" data-view="pattern">格局</a>
+                <a onclick="switchView('yongshen')" data-view="yongshen">用神</a>
+                <a onclick="switchView('shensha')" data-view="shensha">神煞</a>
+                <a onclick="switchView('dayun')" data-view="dayun">大运</a>
+                <a onclick="switchView('minggong')" data-view="minggong">命宫</a>
+                <a onclick="switchView('liuqin')" data-view="liuqin">六亲</a>
+                <a onclick="switchView('zhuanxiang')" data-view="zhuanxiang">专项</a>
+                <a onclick="switchView('wuxing')" data-view="wuxing">五行</a>
+                <a onclick="switchView('congge')" data-view="congge">从格</a>
+                <a onclick="switchView('huaqi')" data-view="huaqi">化气</a>
+                <a onclick="switchView('qiangruo')" data-view="qiangruo">强弱</a>
+                <a onclick="switchView('suiyun')" data-view="suiyun">岁运</a>
+            </div>
+            <div id="content">
+                <div id="view-overview" class="tab-view active"></div>
+                <div id="view-pattern" class="tab-view"></div>
+                <div id="view-yongshen" class="tab-view"></div>
+                <div id="view-shensha" class="tab-view"></div>
+                <div id="view-dayun" class="tab-view"></div>
+                <div id="view-minggong" class="tab-view"></div>
+                <div id="view-liuqin" class="tab-view"></div>
+                <div id="view-zhuanxiang" class="tab-view"></div>
+                <div id="view-wuxing" class="tab-view"></div>
+                <div id="view-congge" class="tab-view"></div>
+                <div id="view-huaqi" class="tab-view"></div>
+                <div id="view-qiangruo" class="tab-view"></div>
+                <div id="view-suiyun" class="tab-view"></div>
+            </div>
+            <div class="mt-4 flex gap-3 flex-wrap justify-center">
+                <button onclick="saveCurrentBazi()" class="btn-outline">保存命盘</button>
+                <button onclick="location.reload()" class="btn-outline">重新排盘</button>
+                <a href="lishi.html" class="btn-outline">查看历史</a>
+            </div>
+        </div>
+    </main>
+    <footer class="footer"><p>梅花易数 · 易学工具 · 仅供学习参考</p></footer>
+
+    <script src="js/bazi-data.js"></script>
+    <script src="js/bazi-engine.js"></script>
+    <script src="js/bazi-main.js"></script>
+    <script>
+        let baziData = null;
+
+        function setNow() {
+            let n = new Date();
+            document.getElementById('b-year').value = n.getFullYear();
+            document.getElementById('b-month').value = n.getMonth() + 1;
+            document.getElementById('b-day').value = n.getDate();
+            document.getElementById('b-hour').value = n.getHours();
+            document.getElementById('b-minute').value = n.getMinutes();
+        }
+        window.onload = function() {
+            setNow();
+            // 检查是否从历史记录跳转过来
+            const saved = sessionStorage.getItem('baziResult');
+            if (saved) {
+                try {
+                    let record = JSON.parse(saved);
+                    baziData = record;
+                    document.getElementById('input-section').classList.add('hidden');
+                    document.getElementById('result-section').classList.remove('hidden');
+                    switchView('overview');
+                    sessionStorage.removeItem('baziResult');
+                } catch(e) {}
+            }
+        };
+
+        function doPaiPan() {
+            let name = document.getElementById('b-name').value.trim();
+            let gender = document.getElementById('b-gender').value;
+            let year = parseInt(document.getElementById('b-year').value);
+            let month = parseInt(document.getElementById('b-month').value);
+            let day = parseInt(document.getElementById('b-day').value);
+            let hour = parseInt(document.getElementById('b-hour').value) || 0;
+            let minute = parseInt(document.getElementById('b-minute').value) || 0;
+            let useTrue = document.getElementById('b-true-time').checked;
+            let lon = parseFloat(document.getElementById('b-longitude').value) || 120;
+            if (!year || !month || !day) { alert('请填写完整出生日期'); return; }
+            let result = window.paiPan(name, gender, year, month, day, hour, minute, lon, useTrue);
+            sessionStorage.setItem('baziResult', JSON.stringify(result));
+            if (window.saveBaziHistory) {
+                let savedId = window.saveBaziHistory(result);
+                console.log('八字已自动保存，编号：' + savedId);
+            }
+            baziData = result;
+            document.getElementById('input-section').classList.add('hidden');
+            document.getElementById('result-section').classList.remove('hidden');
+            switchView('overview');
+        }
+
+        function switchView(view) {
+            document.querySelectorAll('#sub-nav a').forEach(a => a.classList.remove('active'));
+            document.querySelector('#sub-nav a[data-view="'+view+'"]')?.classList.add('active');
+            document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
+            document.getElementById('view-'+view).classList.add('active');
+            if (view === 'overview') renderOverview();
+            else if (view === 'pattern') renderPattern();
+            else if (view === 'yongshen') renderYongShen();
+            else if (view === 'shensha') renderShenSha();
+            else if (view === 'dayun') renderDaYun();
+            else if (view === 'minggong') renderMingGong();
+            else if (view === 'liuqin') renderLiuQin();
+            else if (view === 'zhuanxiang') renderZhuanXiang();
+            else if (view === 'wuxing') renderWuXing();
+            else if (view === 'congge') renderCongGe();
+            else if (view === 'huaqi') renderHuaQi();
+            else if (view === 'qiangruo') renderQiangRuo();
+            else if (view === 'suiyun') renderSuiYun();
+        }
+
+        function loadBaziData() {
+            if (baziData) return true;
+            const raw = sessionStorage.getItem('baziResult');
+            if (!raw) { 
+                document.getElementById('content').innerHTML = '<p class="text-xuan-red text-center py-10">未找到命盘数据，请先排盘。</p>'; 
+                return false; 
+            }
+            baziData = JSON.parse(raw); 
+            return true;
+        }
+
+        function renderBasicInfo(r) {
+            let bt = r.birthTime, tt = r.trueTime;
+            let timeNote = (tt.year !== bt.year || tt.month !== bt.month || tt.day !== bt.day || tt.hour !== bt.hour) ?
+                '<div class="text-sm text-xuan-red mt-1">真太阳时：'+tt.year+'-'+tt.month+'-'+tt.day+' '+String(tt.hour).padStart(2,'0')+':'+String(tt.minute).padStart(2,'0')+'</div>' : '';
+            return '<div class="card-white mb-6"><h3 class="font-serif text-xl font-bold mb-3">'+(r.name || '命盘')+' · '+r.gender+'命 · '+r.riGan+r.riZhi+'日</h3><div class="info-row"><span>公历：'+bt.year+'-'+bt.month+'-'+bt.day+' '+String(bt.hour).padStart(2,'0')+':'+String(bt.minute).padStart(2,'0')+'</span><span>日主：'+r.riGan+'（'+window.TG_WU_XING[r.riGan]+'）</span></div>'+timeNote+'</div>';
+        }
+
+        function renderSiZhu(r) {
+            let s = r.siZhu, ss = r.shiShen, ny = r.naYin, xk = r.xunKong, cg = r.cangGan;
+            return '<div class="bazi-grid">'+
+                '<div class="bazi-pillar"><div class="label">年柱</div><div class="gan">'+s.year.gan+'<div class="shishen">'+ss.year.gan+'</div></div><div class="zhi">'+s.year.zhi+'<div class="shishen">'+ss.year.zhi+'</div></div><div class="nayin">'+ny.year+'</div><div class="xunkong">空亡 '+xk.year+'</div><div class="canggan-list">藏：'+cg.year.map(g=>g+window.getShiShen(r.riGan,g)).join('、')+'</div></div>'+
+                '<div class="bazi-pillar"><div class="label">月柱</div><div class="gan">'+s.month.gan+'<div class="shishen">'+ss.month.gan+'</div></div><div class="zhi">'+s.month.zhi+'<div class="shishen">'+ss.month.zhi+'</div></div><div class="nayin">'+ny.month+'</div><div class="xunkong">空亡 '+xk.month+'</div><div class="canggan-list">藏：'+cg.month.map(g=>g+window.getShiShen(r.riGan,g)).join('、')+'</div></div>'+
+                '<div class="bazi-pillar" style="border-color:var(--xuan-green);box-shadow:0 0 0 2px rgba(45,90,61,0.1);"><div class="label">日柱（日主）</div><div class="gan text-xuan-green">'+s.day.gan+'<div class="shishen">'+ss.day.gan+'</div></div><div class="zhi text-xuan-green">'+s.day.zhi+'<div class="shishen">'+ss.day.zhi+'</div></div><div class="nayin">'+ny.day+'</div><div class="xunkong">空亡 '+xk.day+'</div><div class="canggan-list">藏：'+cg.day.map(g=>g+window.getShiShen(r.riGan,g)).join('、')+'</div></div>'+
+                '<div class="bazi-pillar"><div class="label">时柱</div><div class="gan">'+s.time.gan+'<div class="shishen">'+ss.time.gan+'</div></div><div class="zhi">'+s.time.zhi+'<div class="shishen">'+ss.time.zhi+'</div></div><div class="nayin">'+ny.time+'</div><div class="xunkong">空亡 '+xk.time+'</div><div class="canggan-list">藏：'+cg.time.map(g=>g+window.getShiShen(r.riGan,g)).join('、')+'</div></div>'+
+            '</div>';
+        }
+
+        function renderOverview() {
+            if (!loadBaziData()) return;
+            let r = baziData, s = r.siZhu;
+            let zhiList = [s.year.zhi, s.month.zhi, s.day.zhi, s.time.zhi];
+            let dzRelation = window.getDiZhiRelation(zhiList);
+            let tianGanHe = window.getTianGanHe([s.year.gan, s.month.gan, s.day.gan, s.time.gan]);
+            let geJu = window.getGeJu(r.riGan, s.month.zhi, s.month.gan, s);
+            let tiaoHou = window.getTiaoHou(r.riGan, s.month.zhi);
+            let xiYong = window.getXiYongShen(r.riGan, r.wangShuai, s);
+            let wxStats = window.getWuXingStats(s, r.cangGan);
+            let allSS = window.getAllShenSha(s.day.ganZhi, s.year.ganZhi, s.month.ganZhi, s);
+            let tyMg = window.getTaiYuanMingGong(r.riGan, s.month.ganZhi, s.time.ganZhi, s.year.ganZhi);
+            let dyJiXiong = window.getDaYunJiXiong(r.riGan, window.TG_WU_XING[r.riGan], r.daYun.daYun, r.wangShuai);
+            let zhuanXiang = window.getZhuanXiang(r.riGan, r.gender, s, r.shiShen, r.wangShuai, allSS);
+            // 从格、化气、强弱、岁运
+            let congGe = r.congGe || { isCongGe: false, congType: '', desc: '', stats: {} };
+            let huaQi = r.huaQi || { isHuaQi: false, type: '', desc: '' };
+            let riZhuDetail = r.riZhuDetail || { desc: '', deLing: '', deLingScore: 0, deDi: [], deDiScore: 0, deShi: [], deShiScore: 0, totalScore: 0, level: '' };
+            let dyRelation = r.dyRelation || [];
+            let liuNian = window.getLiuNian(r.birthTime.year, 10);
+
+            let dzRelHtml = '';
+            if (dzRelation.hasRelation) {
+                let parts = [];
+                if (dzRelation.he.length) parts.push('<span style="color:var(--xuan-green)">合：'+dzRelation.he.join('、')+'</span>');
+                if (dzRelation.chong.length) parts.push('<span style="color:var(--xuan-red)">冲：'+dzRelation.chong.join('、')+'</span>');
+                if (dzRelation.sanHe.length) parts.push('<span style="color:var(--xuan-gold)">三合：'+dzRelation.sanHe.join('、')+'</span>');
+                if (dzRelation.xing.length) parts.push('<span style="color:#b83a2a">刑：'+dzRelation.xing.join('、')+'</span>');
+                if (dzRelation.hai.length) parts.push('<span style="color:#666">害：'+dzRelation.hai.join('、')+'</span>');
+                if (dzRelation.po.length) parts.push('<span style="color:#999">破：'+dzRelation.po.join('、')+'</span>');
+                dzRelHtml = '<div class="mt-2 text-sm">'+parts.join('　')+'</div>';
+            }
+            let tianGanHeHtml = tianGanHe.length ? '<div class="mt-2 text-sm"><span style="color:var(--xuan-green)">天干合：'+tianGanHe.join('、')+'</span></div>' : '';
+
+            // 从格HTML
+            let congGeHtml = '';
+            if (congGe.isCongGe) {
+                congGeHtml = '<div class="highlight-box" style="border-left-color:var(--xuan-red)"><p class="text-xuan-red font-medium text-lg">'+congGe.congType+'</p><p class="text-sm text-xuan-brown mt-1">'+congGe.desc+'</p><div class="mt-2 grid grid-cols-3 gap-2 text-sm"><div class="p-2 bg-white rounded">印星：'+congGe.stats.yinCount+'</div><div class="p-2 bg-white rounded">比劫：'+congGe.stats.biJieCount+'</div><div class="p-2 bg-white rounded">财星：'+congGe.stats.caiCount+'</div><div class="p-2 bg-white rounded">官杀：'+congGe.stats.guanCount+'</div><div class="p-2 bg-white rounded">食伤：'+congGe.stats.shiCount+'</div><div class="p-2 bg-white rounded">通根：'+(congGe.stats.hasRoot?'有':'无')+'</div></div></div>';
+            } else {
+                congGeHtml = '<div class="p-3 bg-xuan-paper rounded-lg"><p class="text-xuan-brown">非从格，日主有根有气，按正格论命。</p><div class="mt-2 grid grid-cols-3 gap-2 text-sm"><div class="p-2 bg-white rounded border">印星：'+congGe.stats.yinCount+'</div><div class="p-2 bg-white rounded border">比劫：'+congGe.stats.biJieCount+'</div><div class="p-2 bg-white rounded border">财星：'+congGe.stats.caiCount+'</div><div class="p-2 bg-white rounded border">官杀：'+congGe.stats.guanCount+'</div><div class="p-2 bg-white rounded border">食伤：'+congGe.stats.shiCount+'</div><div class="p-2 bg-white rounded border">通根：'+(congGe.stats.hasRoot?'有':'无')+'</div></div></div>';
+            }
+
+            // 化气格HTML
+            let huaQiHtml = '';
+            if (huaQi.isHuaQi) {
+                huaQiHtml = '<div class="highlight-box" style="border-left-color:var(--xuan-gold)"><p class="text-xuan-gold font-medium text-lg">'+huaQi.type+'</p><p class="text-sm text-xuan-brown mt-1">'+huaQi.desc+'</p></div>';
+            } else {
+                huaQiHtml = '<div class="p-3 bg-xuan-paper rounded-lg"><p class="text-xuan-brown">非化气格。需日干与邻干相合，生于化神当令之月，且化神透出、无克制化神之神。</p></div>';
+            }
+
+            // 日主强弱HTML
+            let qiangRuoHtml = '<div class="space-y-3">';
+            qiangRuoHtml += '<div class="p-3 bg-xuan-paper rounded-lg"><div class="flex justify-between items-center mb-2"><span class="font-medium text-xuan-green">一、得令（月令）</span><span class="text-xuan-gold font-bold">+'+riZhuDetail.deLingScore.toFixed(1)+'</span></div><p class="text-sm text-xuan-brown">'+riZhuDetail.deLingDesc+'</p><p class="text-sm text-xuan-dark mt-1">结论：<b>'+riZhuDetail.deLing+'</b></p></div>';
+            qiangRuoHtml += '<div class="p-3 bg-xuan-paper rounded-lg"><div class="flex justify-between items-center mb-2"><span class="font-medium text-xuan-green">二、得地（通根）</span><span class="text-xuan-gold font-bold">+'+riZhuDetail.deDiScore.toFixed(1)+'</span></div>';
+            if (riZhuDetail.deDi && riZhuDetail.deDi.some(d => d.type !== '无根')) {
+                qiangRuoHtml += '<div class="grid grid-cols-2 gap-2 text-sm">';
+                riZhuDetail.deDi.forEach(d => { if (d.type !== '无根') qiangRuoHtml += '<div class="p-2 bg-white rounded border"><span class="text-xuan-brown">'+d.pos+d.zhi+'</span><span class="text-xuan-dark font-medium"> '+d.type+'</span><span class="text-xuan-gold"> +'+d.weight.toFixed(1)+'</span></div>'; });
+                qiangRuoHtml += '</div>';
+            } else { qiangRuoHtml += '<p class="text-sm text-xuan-red">地支无根</p>'; }
+            qiangRuoHtml += '</div>';
+            qiangRuoHtml += '<div class="p-3 bg-xuan-paper rounded-lg"><div class="flex justify-between items-center mb-2"><span class="font-medium text-xuan-green">三、得势（天干帮扶）</span><span class="text-xuan-gold font-bold">+'+riZhuDetail.deShiScore.toFixed(1)+'</span></div>';
+            if (riZhuDetail.deShi && riZhuDetail.deShi.some(d => d.shiShen !== '无助')) {
+                qiangRuoHtml += '<div class="grid grid-cols-2 gap-2 text-sm">';
+                riZhuDetail.deShi.forEach(d => { if (d.shiShen !== '无助') qiangRuoHtml += '<div class="p-2 bg-white rounded border"><span class="text-xuan-brown">'+d.pos+d.gan+'</span><span class="text-xuan-dark font-medium"> '+d.shiShen+'</span><span class="text-xuan-gold"> +'+d.weight.toFixed(1)+'</span></div>'; });
+                qiangRuoHtml += '</div>';
+            } else { qiangRuoHtml += '<p class="text-sm text-xuan-red">天干无助</p>'; }
+            qiangRuoHtml += '</div>';
+            qiangRuoHtml += '<div class="highlight-box"><p class="text-xuan-dark font-medium">综合评分：'+riZhuDetail.totalScore.toFixed(1)+'分</p><p class="text-xuan-red font-bold text-lg">日主：'+riZhuDetail.level+'</p></div>';
+            qiangRuoHtml += '</div>';
+
+            // 岁运关系HTML
+            let suiYunHtml = '';
+            if (dyRelation && dyRelation.length > 0) {
+                suiYunHtml = '<div class="space-y-2">';
+                dyRelation.forEach(rel => {
+                    const color = rel.jiXiong === '吉' ? 'var(--xuan-green)' : rel.jiXiong === '大凶' ? 'var(--xuan-red)' : 'var(--xuan-brown)';
+                    suiYunHtml += '<div class="p-3 bg-xuan-paper rounded-lg border-l-4" style="border-left-color:'+color+'"><div class="flex justify-between items-center"><span class="font-medium">'+rel.type+'</span><span style="color:'+color+';font-weight:bold">'+rel.jiXiong+'</span></div><p class="text-sm text-xuan-brown mt-1">'+rel.desc+'</p></div>';
+                });
+                suiYunHtml += '</div>';
+            } else { suiYunHtml = '<p class="text-xuan-brown">当前大运与四柱无显著冲合关系。</p>'; }
+
+            // 流年HTML
+            let liuNianHtml = '<div class="flex flex-wrap gap-2">';
+            liuNian.forEach(ln => {
+                liuNianHtml += '<div class="p-2 bg-xuan-paper rounded-lg text-center" style="min-width:60px;"><div class="font-serif font-bold">'+ln.ganZhi+'</div><div class="text-xs text-xuan-brown">'+ln.year+'年</div></div>';
+            });
+            liuNianHtml += '</div>';
+
+            document.getElementById('view-overview').innerHTML = 
+                renderBasicInfo(r) + renderSiZhu(r) + dzRelHtml + tianGanHeHtml +
+                '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">格局 · 用神 · 旺衰</h3><div class="space-y-3"><div class="highlight-box"><p class="text-xuan-dark font-medium">'+geJu.geJu+'格（'+geJu.source+'：'+geJu.target+'）</p><p class="text-sm text-xuan-brown mt-1">'+geJu.desc+'</p></div><div class="p-3 bg-xuan-paper rounded-lg"><p class="text-sm text-xuan-green font-medium">调候用神</p><p class="text-xuan-dark">'+tiaoHou.desc+'</p></div><div class="p-3 bg-xuan-paper rounded-lg"><p class="text-sm text-xuan-green font-medium">喜用神</p><p class="text-xuan-dark">'+xiYong.desc+'</p></div><div class="highlight-box"><p class="text-xuan-dark font-medium">'+r.wangShuai.desc+'</p></div></div></div>'+
+                '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">从格判定</h3>'+congGeHtml+'</div>'+
+                '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">化气格判定</h3>'+huaQiHtml+'</div>'+
+                '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">日主强弱三要素详析</h3>'+qiangRuoHtml+'</div>'+
+                '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">五行 · 神煞</h3><div class="p-3 bg-xuan-paper rounded-lg mb-3"><p class="text-xuan-dark">'+wxStats.desc+'</p></div><div class="flex flex-wrap gap-2">'+(allSS.length ? allSS.map(sh=>'<span class="shensha-tag">'+sh.name+'</span>').join('') : '<span class="text-sm text-xuan-brown">无主要神煞</span>')+'</div></div>'+
+                '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">胎元 · 命宫 · 身宫</h3><div class="grid grid-cols-3 gap-3"><div class="p-3 bg-xuan-paper rounded-lg text-center"><div class="text-sm text-xuan-brown">胎元</div><div class="font-serif text-xl font-bold">'+tyMg.taiYuan+'</div></div><div class="p-3 bg-xuan-paper rounded-lg text-center"><div class="text-sm text-xuan-brown">命宫</div><div class="font-serif text-xl font-bold">'+tyMg.mingGong+'</div></div><div class="p-3 bg-xuan-paper rounded-lg text-center"><div class="text-sm text-xuan-brown">身宫</div><div class="font-serif text-xl font-bold">'+tyMg.shenGong+'</div></div></div></div>'+
+                '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">大运（'+r.daYun.isForward+'，'+r.daYun.qiYunAge+'岁'+r.daYun.qiYunMonth+'个月起运）</h3><table class="dayun-table"><tr><th>大运</th><th>年龄</th><th>年份</th><th>十神</th><th>吉凶</th></tr>'+dyJiXiong.map(d=>'<tr><td class="font-serif font-bold">'+d.ganZhi+'</td><td>'+d.age+'</td><td>'+r.daYun.daYun.find(x=>x.ganZhi===d.ganZhi)?.startYear+'-'+r.daYun.daYun.find(x=>x.ganZhi===d.ganZhi)?.endYear+'</td><td>'+d.shiShen+'</td><td style="color:'+(d.jiXiong==='吉'?'var(--xuan-green)':d.jiXiong==='凶'?'var(--xuan-red)':'var(--xuan-brown)')+';font-weight:bold">'+d.jiXiong+'</td></tr>').join('')+'</table></div>'+
+                '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">大运与四柱关系</h3>'+suiYunHtml+'</div>'+
+                '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">流年（前10年）</h3>'+liuNianHtml+'</div>'+
+                '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">专项详析</h3><div class="space-y-3"><div class="p-3 bg-xuan-paper rounded-lg"><div class="text-sm text-xuan-green font-medium">婚姻</div><div class="text-sm text-xuan-dark">'+zhuanXiang.marriage+'</div></div><div class="p-3 bg-xuan-paper rounded-lg"><div class="text-sm text-xuan-green font-medium">事业</div><div class="text-sm text-xuan-dark">'+zhuanXiang.career+'</div></div><div class="p-3 bg-xuan-paper rounded-lg"><div class="text-sm text-xuan-green font-medium">健康</div><div class="text-sm text-xuan-dark">'+zhuanXiang.health+'</div></div><div class="p-3 bg-xuan-paper rounded-lg"><div class="text-sm text-xuan-green font-medium">财运</div><div class="text-sm text-xuan-dark">'+zhuanXiang.wealth+'</div></div></div></div>';
+        }
+
+        function renderPattern() {
+            if (!loadBaziData()) return;
+            let r = baziData, s = r.siZhu;
+            let geJu = window.getGeJu(r.riGan, s.month.zhi, s.month.gan, s);
+            let zhiList = [s.year.zhi, s.month.zhi, s.day.zhi, s.time.zhi];
+            let dzRelation = window.getDiZhiRelation(zhiList);
+            let tianGanHe = window.getTianGanHe([s.year.gan, s.month.gan, s.day.gan, s.time.gan]);
+            let dzRelHtml = '';
+            if (dzRelation.hasRelation) {
+                let parts = [];
+                if (dzRelation.he.length) parts.push('<span style="color:var(--xuan-green)">合：'+dzRelation.he.join('、')+'</span>');
+                if (dzRelation.chong.length) parts.push('<span style="color:var(--xuan-red)">冲：'+dzRelation.chong.join('、')+'</span>');
+                if (dzRelation.sanHe.length) parts.push('<span style="color:var(--xuan-gold)">三合：'+dzRelation.sanHe.join('、')+'</span>');
+                if (dzRelation.xing.length) parts.push('<span style="color:#b83a2a">刑：'+dzRelation.xing.join('、')+'</span>');
+                if (dzRelation.hai.length) parts.push('<span style="color:#666">害：'+dzRelation.hai.join('、')+'</span>');
+                if (dzRelation.po.length) parts.push('<span style="color:#999">破：'+dzRelation.po.join('、')+'</span>');
+                dzRelHtml = '<div class="mt-2 text-sm">'+parts.join('　')+'</div>';
+            }
+            let tgHeHtml = tianGanHe.length ? '<div class="mt-2 text-sm"><span style="color:var(--xuan-green)">天干合：'+tianGanHe.join('、')+'</span></div>' : '';
+            document.getElementById('view-pattern').innerHTML = 
+                renderBasicInfo(r) + renderSiZhu(r) + dzRelHtml + tgHeHtml +
+                '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">格局判定</h3><div class="highlight-box"><p class="text-xuan-dark font-medium">'+geJu.geJu+'格（'+geJu.source+'：'+geJu.target+'）</p><p class="text-sm text-xuan-brown mt-2">'+geJu.desc+'</p></div></div>'+
+                '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">格局说明</h3><div class="space-y-3 text-sm text-xuan-brown"><p><b>正官格：</b>月令本气或透干为正官，主贵气、守规矩、有责任感。官星得用，仕途有望。</p><p><b>七杀格：</b>月令本气或透干为七杀，主威严、果断、有魄力。杀重需制化，食神制杀或印化杀为权。</p><p><b>正印格：</b>月令本气或透干为正印，主仁慈、学识、有贵人庇护。印旺需财破，否则易懒散。</p><p><b>偏印格：</b>月令本气或透干为偏印，主聪明、偏门技艺、心思细腻。枭神夺食需防。</p><p><b>正财格：</b>月令本气或透干为正财，主务实、勤俭、重视物质生活。财旺需身旺方能任财。</p><p><b>偏财格：</b>月令本气或透干为偏财，主慷慨、善交际、有商业头脑。偏财旺宜经商。</p><p><b>食神格：</b>月令本气或透干为食神，主温和、才华、口福、艺术天赋。食神生财，富贵自然来。</p><p><b>伤官格：</b>月令本气或透干为伤官，主聪明、叛逆、才华横溢。伤官配印，贵不可言。</p></div></div>';
+        }
+
+        function renderYongShen() {
+            if (!loadBaziData()) return;
+            let r = baziData, s = r.siZhu;
+            let tiaoHou = window.getTiaoHou(r.riGan, s.month.zhi);
+            let xiYong = window.getXiYongShen(r.riGan, r.wangShuai, s);
+            document.getElementById('view-yongshen').innerHTML = 
+                renderBasicInfo(r) + renderSiZhu(r) +
+                '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">调候用神</h3><div class="highlight-box"><p class="text-xuan-dark font-medium">'+tiaoHou.desc+'</p></div></div>'+
+                '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">喜用神</h3><div class="space-y-3"><div class="p-3 bg-xuan-paper rounded-lg"><p class="text-sm text-xuan-green font-medium">喜神</p><p class="text-xuan-dark">'+xiYong.xiShen+'</p></div><div class="p-3 bg-xuan-paper rounded-lg"><p class="text-sm text-xuan-green font-medium">用神</p><p class="text-xuan-dark">'+xiYong.yongShen+'</p></div><div class="p-3 bg-xuan-red/5 rounded-lg border border-xuan-red/20"><p class="text-sm text-xuan-red font-medium">'+xiYong.jiShenDesc+'</p></div><div class="highlight-box"><p class="text-xuan-dark">'+xiYong.desc+'</p></div></div></div>'+
+                '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">用神说明</h3><div class="space-y-3 text-sm text-xuan-brown"><p><b>调候用神：</b>依据《穷通宝鉴》，按日干与月令气候，取能调和八字寒暖燥湿的五行。如甲木冬月需丙火解冻、癸水滋润。</p><p><b>喜神：</b>对日主有利的五行，能补日主之不足或泄日主之有余。身强喜泄耗，身弱喜生扶。</p><p><b>用神：</b>八字中最需要的五行，是平衡命局的关键。用神有力则命好，用神无力则命差。</p><p><b>忌神：</b>对日主不利的五行，会加重命局失衡。身强忌生扶，身弱忌泄耗。</p></div></div>';
+        }
+
+        function renderShenSha() {
+            if (!loadBaziData()) return;
+            let r = baziData, s = r.siZhu;
+            let allSS = window.getAllShenSha(s.day.ganZhi, s.year.ganZhi, s.month.ganZhi, s);
+            document.getElementById('view-shensha').innerHTML = 
+                renderBasicInfo(r) + renderSiZhu(r) +
+                '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">神煞（'+allSS.length+'个）</h3><div class="space-y-2">'+(allSS.length ? allSS.map(sh=>'<div class="flex items-start gap-2 p-3 bg-xuan-paper rounded-lg"><span class="shensha-tag" style="flex-shrink:0">'+sh.name+'</span><span class="text-sm text-xuan-brown">'+sh.desc+'</span></div>').join('') : '<span class="text-sm text-xuan-brown">无主要神煞</span>')+'</div></div>'+
+                '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">神煞分类</h3><div class="grid grid-cols-2 gap-3 text-sm"><div class="p-3 bg-xuan-paper rounded-lg"><b class="text-xuan-green">吉神：</b>天乙贵人、文昌贵人、天德贵人、月德贵人、禄神、金舆、将星、魁罡、学堂、词馆、红鸾、天喜</div><div class="p-3 bg-xuan-paper rounded-lg"><b class="text-xuan-red">凶神：</b>羊刃、孤辰、寡宿、天罗、地网、劫煞、灾煞、亡神、勾煞、绞煞、元辰、旬空</div><div class="p-3 bg-xuan-paper rounded-lg"><b class="text-xuan-gold">中性：</b>桃花、驿马、华盖</div></div></div>';
+        }
+
+        function renderDaYun() {
+            if (!loadBaziData()) return;
+            let r = baziData;
+            let dyJiXiong = window.getDaYunJiXiong(r.riGan, window.TG_WU_XING[r.riGan], r.daYun.daYun, r.wangShuai);
+            let xiaoYun = window.getXiaoYun(r.gender, r.siZhu.year.ganZhi, 0, 10);
+            let liuNian = window.getLiuNian(r.birthTime.year, 10);
+            document.getElementById('view-dayun').innerHTML = 
+                renderBasicInfo(r) + renderSiZhu(r) +
+                '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">大运（'+r.daYun.isForward+'，'+r.daYun.qiYunAge+'岁'+r.daYun.qiYunMonth+'个月起运）</h3><table class="dayun-table"><tr><th>大运</th><th>年龄</th><th>年份</th><th>十神</th><th>吉凶</th><th>简析</th></tr>'+dyJiXiong.map(d=>'<tr><td class="font-serif font-bold">'+d.ganZhi+'</td><td>'+d.age+'</td><td>'+r.daYun.daYun.find(x=>x.ganZhi===d.ganZhi)?.startYear+'-'+r.daYun.daYun.find(x=>x.ganZhi===d.ganZhi)?.endYear+'</td><td>'+d.shiShen+'</td><td style="color:'+(d.jiXiong==='吉'?'var(--xuan-green)':d.jiXiong==='凶'?'var(--xuan-red)':'var(--xuan-brown)')+';font-weight:bold">'+d.jiXiong+'</td><td class="text-sm">'+d.desc+'</td></tr>').join('')+'</table></div>'+
+                '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">小运（前10年）</h3><div class="flex flex-wrap gap-2">'+xiaoYun.map(xy=>'<div class="p-2 bg-xuan-paper rounded-lg text-center" style="min-width:60px;"><div class="font-serif font-bold">'+xy.ganZhi+'</div><div class="text-xs text-xuan-brown">'+xy.age+'岁</div></div>').join('')+'</div></div>'+
+                '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">流年（前10年）</h3><div class="flex flex-wrap gap-2">'+liuNian.map(ln=>'<div class="p-2 bg-xuan-paper rounded-lg text-center" style="min-width:60px;"><div class="font-serif font-bold">'+ln.ganZhi+'</div><div class="text-xs text-xuan-brown">'+ln.year+'年</div></div>').join('')+'</div></div>';
+        }
+
+        function renderMingGong() {
+            if (!loadBaziData()) return;
+            let r = baziData, s = r.siZhu;
+            let tyMg = window.getTaiYuanMingGong(r.riGan, s.month.ganZhi, s.time.ganZhi, s.year.ganZhi);
+            document.getElementById('view-minggong').innerHTML = 
+                renderBasicInfo(r) + renderSiZhu(r) +
+                '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">胎元 · 命宫 · 身宫</h3><div class="grid grid-cols-3 gap-3"><div class="p-4 bg-xuan-paper rounded-lg text-center"><div class="text-sm text-xuan-brown mb-2">胎元</div><div class="font-serif text-3xl font-bold">'+tyMg.taiYuan+'</div><div class="text-xs text-xuan-brown mt-2">受胎之月，先天根基</div></div><div class="p-4 bg-xuan-paper rounded-lg text-center"><div class="text-sm text-xuan-brown mb-2">命宫</div><div class="font-serif text-3xl font-bold">'+tyMg.mingGong+'</div><div class="text-xs text-xuan-brown mt-2">立命之宫，后天造化</div></div><div class="p-4 bg-xuan-paper rounded-lg text-center"><div class="text-sm text-xuan-brown mb-2">身宫</div><div class="font-serif text-3xl font-bold">'+tyMg.shenGong+'</div><div class="text-xs text-xuan-brown mt-2">安身之处，行为表现</div></div></div></div>'+
+                '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">命宫说明</h3><div class="space-y-3 text-sm text-xuan-brown"><p><b>胎元：</b>胎元为受胎之月，代表先天根基、遗传基因、父母影响。胎元纳音与年柱纳音相生则先天福厚，相克则先天根基薄弱。</p><p><b>命宫：</b>命宫为立命之宫，代表后天造化、人生格局、性格特点。命宫干支与日主关系决定后天发展方向。命宫吉则一生顺遂，命宫凶则多波折。</p><p><b>身宫：</b>身宫为安身之处，代表行为表现、处世方式、中年以后的运势。身宫与命宫同宫则身心合一，不同宫则心口不一。</p></div></div>';
+        }
+
+        function renderLiuQin() {
+            if (!loadBaziData()) return;
+            let r = baziData;
+            let liuQin = window.getLiuQin(r.riGan, r.gender, r.siZhu, r.shiShen);
+            document.getElementById('view-liuqin').innerHTML = 
+                renderBasicInfo(r) + renderSiZhu(r) +
+                '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">六亲分析</h3><div class="grid grid-cols-2 gap-3"><div class="p-4 bg-xuan-paper rounded-lg"><div class="text-sm text-xuan-green font-medium mb-2">父亲</div><div class="text-xuan-dark">'+liuQin.father+'</div></div><div class="p-4 bg-xuan-paper rounded-lg"><div class="text-sm text-xuan-green font-medium mb-2">母亲</div><div class="text-xuan-dark">'+liuQin.mother+'</div></div><div class="p-4 bg-xuan-paper rounded-lg"><div class="text-sm text-xuan-green font-medium mb-2">'+(r.gender==='男'?'妻子':'丈夫')+'</div><div class="text-xuan-dark">'+(r.gender==='男'?liuQin.wife:liuQin.husband)+'</div></div><div class="p-4 bg-xuan-paper rounded-lg"><div class="text-sm text-xuan-green font-medium mb-2">子女</div><div class="text-xuan-dark">'+liuQin.children+'</div></div><div class="p-4 bg-xuan-paper rounded-lg"><div class="text-sm text-xuan-green font-medium mb-2">'+(r.gender==='男'?'兄弟':'姐妹')+'</div><div class="text-xuan-dark">'+liuQin.brother+'</div></div></div></div>'+
+                '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">六亲说明</h3><div class="space-y-3 text-sm text-xuan-brown"><p><b>男命六亲：</b>偏财为父，正印为母，正财为妻，七杀为子，食神为女，比肩为兄弟，劫财为姐妹。</p><p><b>女命六亲：</b>正财为父，偏印为母，正官为夫，七杀为偏夫，食神为女，伤官为子，比肩为姐妹，劫财为兄弟。</p><p><b>判断原则：</b>六亲星透干有力则缘分深厚，藏支则缘分较浅。六亲星被冲克则关系易有波折，得生扶则关系和睦。</p></div></div>';
+        }
+
+        function renderZhuanXiang() {
+            if (!loadBaziData()) return;
+            let r = baziData, s = r.siZhu;
+            let allSS = window.getAllShenSha(s.day.ganZhi, s.year.ganZhi, s.month.ganZhi, s);
+            let zhuanXiang = window.getZhuanXiang(r.riGan, r.gender, s, r.shiShen, r.wangShuai, allSS);
+            document.getElementById('view-zhuanxiang').innerHTML = 
+                renderBasicInfo(r) + renderSiZhu(r) +
+                '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">婚姻感情</h3><div class="highlight-box"><p class="text-xuan-dark">'+zhuanXiang.marriage+'</p></div></div>'+
+                '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">事业前程</h3><div class="highlight-box"><p class="text-xuan-dark">'+zhuanXiang.career+'</p></div></div>'+
+                '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">健康状况</h3><div class="highlight-box"><p class="text-xuan-dark">'+zhuanXiang.health+'</p></div></div>'+
+                '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">财运分析</h3><div class="highlight-box"><p class="text-xuan-dark">'+zhuanXiang.wealth+'</p></div></div>';
+        }
+
+        function renderWuXing() {
+            if (!loadBaziData()) return;
+            let r = baziData;
+            let wxStats = window.getWuXingStats(r.siZhu, r.cangGan);
+            let nayinXiang = {
+                year: window.getNayinXiang(r.naYin.year),
+                month: window.getNayinXiang(r.naYin.month),
+                day: window.getNayinXiang(r.naYin.day),
+                time: window.getNayinXiang(r.naYin.time)
+            };
+            document.getElementById('view-wuxing').innerHTML = 
+                renderBasicInfo(r) + renderSiZhu(r) +
+                '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">五行统计</h3><div class="highlight-box"><p class="text-xuan-dark font-medium">'+wxStats.desc+'</p></div><div class="flex gap-4 mt-3 text-sm justify-center"><span class="px-3 py-1 bg-xuan-paper rounded">金 '+wxStats.stats['金'].toFixed(1)+'</span><span class="px-3 py-1 bg-xuan-paper rounded">木 '+wxStats.stats['木'].toFixed(1)+'</span><span class="px-3 py-1 bg-xuan-paper rounded">水 '+wxStats.stats['水'].toFixed(1)+'</span><span class="px-3 py-1 bg-xuan-paper rounded">火 '+wxStats.stats['火'].toFixed(1)+'</span><span class="px-3 py-1 bg-xuan-paper rounded">土 '+wxStats.stats['土'].toFixed(1)+'</span></div></div>'+
+                '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">纳音取象</h3><div class="space-y-3"><div class="p-3 bg-xuan-paper rounded-lg"><div class="text-sm text-xuan-green font-medium">年柱纳音 · '+r.naYin.year+'</div><div class="text-sm text-xuan-brown mt-1">'+nayinXiang.year+'</div></div><div class="p-3 bg-xuan-paper rounded-lg"><div class="text-sm text-xuan-green font-medium">月柱纳音 · '+r.naYin.month+'</div><div class="text-sm text-xuan-brown mt-1">'+nayinXiang.month+'</div></div><div class="p-3 bg-xuan-paper rounded-lg"><div class="text-sm text-xuan-green font-medium">日柱纳音 · '+r.naYin.day+'</div><div class="text-sm text-xuan-brown mt-1">'+nayinXiang.day+'</div></div><div class="p-3 bg-xuan-paper rounded-lg"><div class="text-sm text-xuan-green font-medium">时柱纳音 · '+r.naYin.time+'</div><div class="text-sm text-xuan-brown mt-1">'+nayinXiang.time+'</div></div></div></div>';
+        }
+
+        
+        function renderCongGe() {
+            if (!loadBaziData()) return;
+            let r = baziData;
+            let cg = r.congGe;
+            let hua = r.huaQi;
+            let html = renderBasicInfo(r) + renderSiZhu(r);
+
+            html += '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">从格判定</h3>';
+            if (cg.isCongGe) {
+                html += '<div class="highlight-box"><p class="text-xuan-red font-medium text-lg">' + cg.congType + '</p><p class="text-sm text-xuan-brown mt-2">' + cg.desc + '</p></div>';
+                html += '<div class="mt-3 grid grid-cols-3 gap-2 text-sm"><div class="p-2 bg-xuan-paper rounded">印星：' + cg.stats.yinCount + '</div><div class="p-2 bg-xuan-paper rounded">比劫：' + cg.stats.biJieCount + '</div><div class="p-2 bg-xuan-paper rounded">财星：' + cg.stats.caiCount + '</div><div class="p-2 bg-xuan-paper rounded">官杀：' + cg.stats.guanCount + '</div><div class="p-2 bg-xuan-paper rounded">食伤：' + cg.stats.shiCount + '</div><div class="p-2 bg-xuan-paper rounded">地支通根：' + (cg.stats.hasRoot ? '有' : '无') + '</div></div>';
+            } else {
+                html += '<div class="p-3 bg-xuan-paper rounded-lg"><p class="text-xuan-brown">非从格，日主有根有气，可按正格论命。</p><div class="mt-2 grid grid-cols-3 gap-2 text-sm"><div class="p-2 bg-white rounded border">印星：' + cg.stats.yinCount + '</div><div class="p-2 bg-white rounded border">比劫：' + cg.stats.biJieCount + '</div><div class="p-2 bg-white rounded border">财星：' + cg.stats.caiCount + '</div><div class="p-2 bg-white rounded border">官杀：' + cg.stats.guanCount + '</div><div class="p-2 bg-white rounded border">食伤：' + cg.stats.shiCount + '</div><div class="p-2 bg-white rounded border">地支通根：' + (cg.stats.hasRoot ? '有' : '无') + '</div></div></div>';
+            }
+            html += '</div>';
+
+            html += '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">从格说明</h3><div class="space-y-3 text-sm text-xuan-brown"><p><b>从强格：</b>日主极旺，印比成势，无财官食伤。喜印比，忌克泄耗。</p><p><b>从财格：</b>日主弱极，财星独旺，无印比。喜财食伤，忌印比。</p><p><b>从杀格：</b>日主弱极，官杀独旺，无印比。喜官杀财，忌印比食伤。</p><p><b>从儿格：</b>日主弱极，食伤独旺，无印比。喜食伤财，忌印比官杀。</p><p><b>从弱格：</b>日主弱极，财官食伤旺，无印比。喜克泄耗，忌生扶。</p></div></div>';
+            document.getElementById('view-congge').innerHTML = html;
+        }
+
+        function renderHuaQi() {
+            if (!loadBaziData()) return;
+            let r = baziData;
+            let hua = r.huaQi;
+            let html = renderBasicInfo(r) + renderSiZhu(r);
+
+            html += '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">化气格判定</h3>';
+            if (hua.isHuaQi) {
+                html += '<div class="highlight-box"><p class="text-xuan-red font-medium text-lg">' + hua.type + '</p><p class="text-sm text-xuan-brown mt-2">' + hua.desc + '</p></div>';
+            } else {
+                html += '<div class="p-3 bg-xuan-paper rounded-lg"><p class="text-xuan-brown">非化气格。化气格需日干与邻干相合，生于化神当令之月，且化神透出、无克制化神之神。</p></div>';
+            }
+            html += '</div>';
+
+            html += '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">化气格条件</h3><div class="space-y-3 text-sm text-xuan-brown"><p><b>甲己化土：</b>生于辰戌丑未巳午月，土旺当令，无木克制。</p><p><b>乙庚化金：</b>生于申酉辰戌丑未月，金旺当令，无火克制。</p><p><b>丙辛化水：</b>生于亥子申酉辰丑月，水旺当令，无土克制。</p><p><b>丁壬化木：</b>生于寅卯亥子未辰月，木旺当令，无金克制。</p><p><b>戊癸化火：</b>生于巳午寅卯戌未月，火旺当令，无水克制。</p><p><b>必要条件：</b>①日干参与合化 ②化神当令 ③化神透出 ④无克制化神之神。</p></div></div>';
+            document.getElementById('view-huaqi').innerHTML = html;
+        }
+
+        function renderQiangRuo() {
+            if (!loadBaziData()) return;
+            let r = baziData;
+            let detail = r.riZhuDetail;
+            let html = renderBasicInfo(r) + renderSiZhu(r);
+
+            html += '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">日主强弱三要素详析</h3>';
+            html += '<div class="space-y-3">';
+
+            // 得令
+            html += '<div class="p-3 bg-xuan-paper rounded-lg"><div class="flex justify-between items-center mb-2"><span class="font-medium text-xuan-green">一、得令（月令）</span><span class="text-xuan-gold font-bold">+' + detail.deLingScore.toFixed(1) + '</span></div><p class="text-sm text-xuan-brown">' + detail.deLingDesc + '</p><p class="text-sm text-xuan-dark mt-1">结论：<b>' + detail.deLing + '</b></p></div>';
+
+            // 得地
+            html += '<div class="p-3 bg-xuan-paper rounded-lg"><div class="flex justify-between items-center mb-2"><span class="font-medium text-xuan-green">二、得地（通根）</span><span class="text-xuan-gold font-bold">+' + detail.deDiScore.toFixed(1) + '</span></div>';
+            if (detail.deDi.some(d => d.type !== '无根')) {
+                html += '<div class="grid grid-cols-2 gap-2 text-sm">';
+                detail.deDi.forEach(d => {
+                    if (d.type !== '无根') {
+                        html += '<div class="p-2 bg-white rounded border"><span class="text-xuan-brown">' + d.pos + d.zhi + '</span><span class="text-xuan-dark font-medium"> ' + d.type + '</span><span class="text-xuan-gold"> +' + d.weight.toFixed(1) + '</span></div>';
+                    }
+                });
+                html += '</div>';
+            } else {
+                html += '<p class="text-sm text-xuan-red">地支无根，日主漂浮。</p>';
+            }
+            html += '</div>';
+
+            // 得势
+            html += '<div class="p-3 bg-xuan-paper rounded-lg"><div class="flex justify-between items-center mb-2"><span class="font-medium text-xuan-green">三、得势（天干帮扶）</span><span class="text-xuan-gold font-bold">+' + detail.deShiScore.toFixed(1) + '</span></div>';
+            if (detail.deShi.some(d => d.shiShen !== '无助')) {
+                html += '<div class="grid grid-cols-2 gap-2 text-sm">';
+                detail.deShi.forEach(d => {
+                    if (d.shiShen !== '无助') {
+                        html += '<div class="p-2 bg-white rounded border"><span class="text-xuan-brown">' + d.pos + d.gan + '</span><span class="text-xuan-dark font-medium"> ' + d.shiShen + '</span><span class="text-xuan-gold"> +' + d.weight.toFixed(1) + '</span></div>';
+                    }
+                });
+                html += '</div>';
+            } else {
+                html += '<p class="text-sm text-xuan-red">天干无助，孤立无援。</p>';
+            }
+            html += '</div>';
+
+            // 综合
+            html += '<div class="highlight-box"><p class="text-xuan-dark font-medium">综合评分：' + detail.totalScore.toFixed(1) + '分</p><p class="text-xuan-red font-bold text-lg">日主：' + detail.level + '</p><p class="text-sm text-xuan-brown mt-1">' + detail.desc + '</p></div>';
+
+            html += '</div></div>';
+
+            html += '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">三要素说明</h3><div class="space-y-3 text-sm text-xuan-brown"><p><b>得令：</b>月令为提纲，司四时之令，掌五行之权。日主与月令同类或得月令生扶为得令，受月令克制为失令。</p><p><b>得地：</b>地支通根，如树木之有根。本气通根最强，中气次之，余气最弱。日支、月令之根最重。</p><p><b>得势：</b>天干比劫印星帮扶，如树木之有枝叶。月干、时干、年干依次递减。</p><p><b>判断原则：</b>得令+得地+得势三者占其二以上为强，占其一为中和，三者皆无为弱。</p></div></div>';
+            document.getElementById('view-qiangruo').innerHTML = html;
+        }
+
+        function renderSuiYun() {
+            if (!loadBaziData()) return;
+            let r = baziData;
+            let html = renderBasicInfo(r) + renderSiZhu(r);
+
+            // 大运与四柱关系
+            html += '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">大运与四柱关系</h3>';
+            if (r.dyRelation && r.dyRelation.length > 0) {
+                html += '<div class="space-y-2">';
+                r.dyRelation.forEach(rel => {
+                    const color = rel.jiXiong === '吉' ? 'var(--xuan-green)' : rel.jiXiong === '大凶' ? 'var(--xuan-red)' : 'var(--xuan-brown)';
+                    html += '<div class="p-3 bg-xuan-paper rounded-lg border-l-4" style="border-left-color:' + color + '"><div class="flex justify-between items-center"><span class="font-medium">' + rel.type + '</span><span style="color:' + color + ';font-weight:bold">' + rel.jiXiong + '</span></div><p class="text-sm text-xuan-brown mt-1">' + rel.desc + '</p></div>';
+                });
+                html += '</div>';
+            } else {
+                html += '<p class="text-xuan-brown">当前大运与四柱无显著冲合关系。</p>';
+            }
+            html += '</div>';
+
+            // 流年分析（最近10年）
+            html += '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">流年与四柱关系（最近10年）</h3>';
+            const currentYear = new Date().getFullYear();
+            let lnHtml = '<div class="space-y-2">';
+            for (let i = 0; i < 10; i++) {
+                const year = currentYear + i;
+                const gIdx = (year - 4) % 10, zIdx = (year - 4) % 12;
+                const gz = BA_TIAN_GAN[gIdx < 0 ? gIdx + 10 : gIdx] + BA_DI_ZHI[zIdx < 0 ? zIdx + 12 : zIdx];
+                const lnRel = getLiuNianRelation(r.riGan, r.riZhi, gz, r.siZhu);
+                if (lnRel.length > 0) {
+                    lnRel.forEach(rel => {
+                        const color = rel.jiXiong === '吉' ? 'var(--xuan-green)' : rel.jiXiong === '大凶' ? 'var(--xuan-red)' : 'var(--xuan-brown)';
+                        lnHtml += '<div class="p-3 bg-xuan-paper rounded-lg border-l-4" style="border-left-color:' + color + '"><div class="flex justify-between items-center"><span class="font-medium">' + year + '年 ' + rel.type + '</span><span style="color:' + color + ';font-weight:bold">' + rel.jiXiong + '</span></div><p class="text-sm text-xuan-brown mt-1">' + rel.desc + '</p></div>';
+                    });
+                }
+            }
+            lnHtml += '</div>';
+            html += lnHtml;
+            html += '</div>';
+
+            // 岁运并临与天克地冲检查
+            html += '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">岁运并临与天克地冲</h3>';
+            html += '<div class="space-y-2">';
+            const dyList = r.daYun.daYun;
+            for (let i = 0; i < 10; i++) {
+                const year = currentYear + i;
+                const gIdx = (year - 4) % 10, zIdx = (year - 4) % 12;
+                const gz = BA_TIAN_GAN[gIdx < 0 ? gIdx + 10 : gIdx] + BA_DI_ZHI[zIdx < 0 ? zIdx + 12 : zIdx];
+                dyList.forEach(dy => {
+                    const sybl = getSuiYunBingLin(dy.ganZhi, gz);
+                    if (sybl.isBingLin) {
+                        html += '<div class="p-3 bg-xuan-red/5 rounded-lg border border-xuan-red/20"><p class="text-xuan-red font-bold">' + year + '年：' + sybl.desc + '</p></div>';
+                    }
+                    const tkdc = getTianKeDiChong(dy.ganZhi, gz, r.siZhu.day.ganZhi);
+                    tkdc.forEach(t => {
+                        html += '<div class="p-3 bg-xuan-red/5 rounded-lg border border-xuan-red/20"><p class="text-xuan-red font-bold">' + year + '年（大运' + dy.ganZhi + '）：' + t.desc + '</p></div>';
+                    });
+                });
+            }
+            html += '</div></div>';
+
+            html += '<div class="card-white mb-6"><h3 class="font-serif text-lg font-bold mb-3">岁运关系说明</h3><div class="space-y-3 text-sm text-xuan-brown"><p><b>岁运并临：</b>大运与流年干支相同，吉凶加倍，需特别注意。</p><p><b>天克地冲：</b>天干相克、地支相冲，主该年/该运有重大变动，尤以冲日柱为大凶。</p><p><b>冲合：</b>冲主动荡、分离；合主和顺、聚合。冲合年柱主长辈，冲合月柱主父母兄弟，冲合日柱主本人婚姻，冲合时柱主子女。</p><p><b>流年吉凶：</b>流年吉神临身则吉，凶神临身则凶。需结合大运、命局综合判断。</p></div></div>';
+            document.getElementById('view-suiyun').innerHTML = html;
+        }
+
+        function saveCurrentBazi() {
+            if (!baziData) { alert('无数据可保存'); return; }
+            try {
+                const id = window.saveBaziHistory(baziData);
+                alert(id ? '已保存，编号：'+id : '保存失败');
+            } catch(e) { alert('保存出错'); }
+        }
+    </script>
+</body>
+</html>
